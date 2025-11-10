@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Attributes - SenangWebs Reel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../dist/swr.min.css">
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="gradient-bg text-white shadow-lg">
+        <div class="container mx-auto px-4 py-8">
+            <h1 class="text-4xl font-bold mb-2">🏷️ Data Attributes Method</h1>
+            <p class="text-lg opacity-90">HTML-first initialization approach</p>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4">
+            <ul class="flex space-x-1 overflow-x-auto py-3">
+                <li><a href="index.html" class="px-4 py-2 rounded-lg hover:bg-gray-100 text-gray-700 font-medium transition">Basic Examples</a></li>
+                <li><a href="advanced.html" class="px-4 py-2 rounded-lg hover:bg-gray-100 text-gray-700 font-medium transition">Advanced</a></li>
+                <li><a href="media-examples.html" class="px-4 py-2 rounded-lg hover:bg-gray-100 text-gray-700 font-medium transition">Media Types</a></li>
+                <li><a href="responsive.html" class="px-4 py-2 rounded-lg hover:bg-gray-100 text-gray-700 font-medium transition">Responsive</a></li>
+                <li><a href="data-attributes.html" class="px-4 py-2 rounded-lg bg-purple-600 text-white font-medium">Data Attributes</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        
+        <!-- Introduction -->
+        <section class="mb-16">
+            <div class="bg-gradient-to-r from-purple-500 to-indigo-600 rounded-xl shadow-lg p-8 text-white">
+                <h2 class="text-3xl font-bold mb-4">Why Data Attributes?</h2>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div>
+                        <h3 class="text-xl font-semibold mb-3">✨ Benefits:</h3>
+                        <ul class="space-y-2">
+                            <li>• No JavaScript required for basic setup</li>
+                            <li>• Cleaner HTML markup</li>
+                            <li>• Easier for non-developers to configure</li>
+                            <li>• Server-side rendering friendly</li>
+                            <li>• Content management system (CMS) compatible</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-semibold mb-3">🎯 Use Cases:</h3>
+                        <ul class="space-y-2">
+                            <li>• WordPress/CMS implementations</li>
+                            <li>• Static site generators</li>
+                            <li>• Quick prototypes</li>
+                            <li>• HTML-only projects</li>
+                            <li>• Server-rendered content</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Example 1: Basic Data Attribute Setup -->
+        <section class="mb-16">
+            <div class="bg-white rounded-xl shadow-lg p-8">
+                <div class="mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-2">📌 Basic Setup</h2>
+                    <p class="text-gray-600">Initialize roll using only HTML data attributes.</p>
+                </div>
+                
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div>
+                        <!-- Data Attribute Roll -->
+                        <div data-swr data-swr-aspect-ratio="9:16" data-swr-loop="true" data-swr-touch="true" data-swr-wheel="true" class="rounded-lg overflow-hidden shadow-md">
+                            <div data-swr-item>
+                                <div class="h-full bg-gradient-to-br from-blue-500 to-blue-700 flex flex-col items-center justify-center text-white p-8">
+                                    <div class="text-6xl mb-4">🎯</div>
+                                    <h1 class="text-3xl font-bold mb-2">Slide 1</h1>
+                                    <p class="text-lg">Data Attributes Setup</p>
+                                </div>
+                            </div>
+                            <div data-swr-item>
+                                <div class="h-full bg-gradient-to-br from-purple-500 to-purple-700 flex flex-col items-center justify-center text-white p-8">
+                                    <div class="text-6xl mb-4">✨</div>
+                                    <h1 class="text-3xl font-bold mb-2">Slide 2</h1>
+                                    <p class="text-lg">No JS Required</p>
+                                </div>
+                            </div>
+                            <div data-swr-item>
+                                <div class="h-full bg-gradient-to-br from-green-500 to-teal-600 flex flex-col items-center justify-center text-white p-8">
+                                    <div class="text-6xl mb-4">🚀</div>
+                                    <h1 class="text-3xl font-bold mb-2">Slide 3</h1>
+                                    <p class="text-lg">Pure HTML Config</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-lg mb-3 text-gray-700">HTML Code:</h3>
+                        <div class="bg-gray-900 text-green-400 rounded-lg p-4 overflow-x-auto">
+                            <pre class="text-sm font-mono"><code>&lt;div data-swr 
+     data-swr-aspect-ratio="9:16" 
+     data-swr-loop="true"&gt;
+  
+  &lt;div data-swr-item&gt;
+    &lt;div&gt;Slide 1 content&lt;/div&gt;
+  &lt;/div&gt;
+  
+  &lt;div data-swr-item&gt;
+    &lt;div&gt;Slide 2 content&lt;/div&gt;
+  &lt;/div&gt;
+  
+  &lt;div data-swr-item&gt;
+    &lt;div&gt;Slide 3 content&lt;/div&gt;
+  &lt;/div&gt;
+  
+&lt;/div&gt;</code></pre>
+                        </div>
+                        <div class="mt-4 bg-blue-50 border-l-4 border-blue-500 p-3">
+                            <p class="text-sm text-blue-800"><strong>That's it!</strong> The roll initializes automatically when the page loads.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Example 2: Full Configuration -->
+        <section class="mb-16">
+            <div class="bg-white rounded-xl shadow-lg p-8">
+                <div class="mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-2">⚙️ Full Configuration</h2>
+                    <p class="text-gray-600">All available data attribute options.</p>
+                </div>
+                
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div>
+                        <!-- Full Config Roll -->
+                        <div data-swr 
+                             data-swr-aspect-ratio="9:16"
+                             data-swr-loop="true"
+                             data-swr-autoplay="true"
+                             data-swr-autoplay-interval="4000"
+                             data-swr-keyboard="true"
+                             data-swr-touch="true"
+                             data-swr-transition="300"
+                             class="rounded-lg overflow-hidden shadow-md">
+                            <div data-swr-item>
+                                <div class="h-full bg-gradient-to-br from-red-500 to-pink-600 flex items-center justify-center text-white text-center p-8">
+                                    <div>
+                                        <div class="text-6xl mb-4">⚡</div>
+                                        <h2 class="text-3xl font-bold mb-2">Fully Configured</h2>
+                                        <p class="text-lg">All options enabled</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div data-swr-item>
+                                <div class="h-full bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center text-white text-center p-8">
+                                    <div>
+                                        <div class="text-6xl mb-4">🎨</div>
+                                        <h2 class="text-3xl font-bold mb-2">Autoplay Active</h2>
+                                        <p class="text-lg">4 second intervals</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div data-swr-item>
+                                <div class="h-full bg-gradient-to-br from-yellow-500 to-orange-600 flex items-center justify-center text-white text-center p-8">
+                                    <div>
+                                        <div class="text-6xl mb-4">✅</div>
+                                        <h2 class="text-3xl font-bold mb-2">Complete Setup</h2>
+                                        <p class="text-lg">Via data attributes</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-lg mb-3 text-gray-700">Complete HTML:</h3>
+                        <div class="bg-gray-900 text-green-400 rounded-lg p-4 overflow-x-auto">
+                            <pre class="text-xs font-mono"><code>&lt;div data-swr 
+     data-swr-aspect-ratio="9:16"
+     data-swr-loop="true"
+     data-swr-autoplay="true"
+     data-swr-autoplay-interval="4000"
+     data-swr-keyboard="true"
+     data-swr-touch="true"
+     data-swr-transition="300"&gt;
+  
+  &lt;div data-swr-item&gt;
+    &lt;!-- Slide content --&gt;
+  &lt;/div&gt;
+  
+&lt;/div&gt;</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Example 3: Mixed Content Types -->
+        <section class="mb-16">
+            <div class="bg-white rounded-xl shadow-lg p-8">
+                <div class="mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-2">🎭 Mixed Content</h2>
+                    <p class="text-gray-600">Combine images, videos, and HTML content using data attributes.</p>
+                </div>
+                
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div>
+                        <!-- Mixed Content Roll -->
+                        <div data-swr data-swr-aspect-ratio="9:16" data-swr-loop="true" class="rounded-lg overflow-hidden shadow-md">
+                            <!-- HTML Content -->
+                            <div data-swr-item>
+                                <div class="h-full bg-gradient-to-br from-indigo-500 to-purple-600 flex flex-col items-center justify-center text-white p-8">
+                                    <div class="text-6xl mb-4">📝</div>
+                                    <h2 class="text-3xl font-bold mb-2">HTML Slide</h2>
+                                    <p class="text-lg">Custom content</p>
+                                </div>
+                            </div>
+                            <!-- Image -->
+                            <div data-swr-item>
+                                <img src="https://picsum.photos/seed/data1/400/700" alt="Example image" class="w-full h-full object-cover">
+                            </div>
+                            <!-- HTML Content -->
+                            <div data-swr-item>
+                                <div class="h-full bg-gradient-to-br from-cyan-500 to-blue-600 flex flex-col items-center justify-center text-white p-8">
+                                    <div class="text-6xl mb-4">🎨</div>
+                                    <h2 class="text-3xl font-bold mb-2">Another HTML</h2>
+                                    <p class="text-lg">Flexible content</p>
+                                </div>
+                            </div>
+                            <!-- Image -->
+                            <div data-swr-item>
+                                <img src="https://picsum.photos/seed/data2/400/700" alt="Second image" class="w-full h-full object-cover">
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-lg mb-3 text-gray-700">Mixed Content HTML:</h3>
+                        <div class="bg-gray-900 text-green-400 rounded-lg p-4 overflow-x-auto">
+                            <pre class="text-xs font-mono"><code>&lt;div data-swr 
+     data-swr-aspect-ratio="9:16"
+     data-swr-loop="true"&gt;
+  
+  &lt;!-- HTML Content --&gt;
+  &lt;div data-swr-item&gt;
+    &lt;div class="..."&gt;
+      Custom HTML
+    &lt;/div&gt;
+  &lt;/div&gt;
+  
+  &lt;!-- Image --&gt;
+  &lt;div data-swr-item&gt;
+    &lt;img src="image.jpg" alt="..."&gt;
+  &lt;/div&gt;
+  
+  &lt;!-- Video --&gt;
+  &lt;div data-swr-item&gt;
+    &lt;video autoplay muted&gt;
+      &lt;source src="video.mp4"&gt;
+    &lt;/video&gt;
+  &lt;/div&gt;
+  
+&lt;/div&gt;</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Configuration Reference -->
+        <section class="mb-16">
+            <div class="bg-white rounded-xl shadow-lg p-8">
+                <div class="mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-2">📚 Data Attribute Reference</h2>
+                    <p class="text-gray-600">Complete list of available configuration attributes.</p>
+                </div>
+                
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="bg-gray-100 border-b-2 border-gray-300">
+                                <th class="text-left p-3 font-semibold">Attribute</th>
+                                <th class="text-left p-3 font-semibold">Type</th>
+                                <th class="text-left p-3 font-semibold">Default</th>
+                                <th class="text-left p-3 font-semibold">Description</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200">
+                            <tr>
+                                <td class="p-3"><code class="bg-purple-100 text-purple-800 px-2 py-1 rounded text-xs">data-swr</code></td>
+                                <td class="p-3 text-gray-600">-</td>
+                                <td class="p-3 text-gray-600">-</td>
+                                <td class="p-3 text-gray-600">Main identifier - required on container</td>
+                            </tr>
+                            <tr class="bg-gray-50">
+                                <td class="p-3"><code class="bg-purple-100 text-purple-800 px-2 py-1 rounded text-xs">data-swr-item</code></td>
+                                <td class="p-3 text-gray-600">-</td>
+                                <td class="p-3 text-gray-600">-</td>
+                                <td class="p-3 text-gray-600">Marks individual slide items</td>
+                            </tr>
+                            <tr>
+                                <td class="p-3"><code class="bg-purple-100 text-purple-800 px-2 py-1 rounded text-xs">data-swr-aspect-ratio</code></td>
+                                <td class="p-3 text-gray-600">string</td>
+                                <td class="p-3 text-gray-600">'9:16'</td>
+                                <td class="p-3 text-gray-600">Aspect ratio (e.g., '9:16', '16:9', '1:1')</td>
+                            </tr>
+                            <tr class="bg-gray-50">
+                                <td class="p-3"><code class="bg-purple-100 text-purple-800 px-2 py-1 rounded text-xs">data-swr-loop</code></td>
+                                <td class="p-3 text-gray-600">boolean</td>
+                                <td class="p-3 text-gray-600">false</td>
+                                <td class="p-3 text-gray-600">Enable infinite looping</td>
+                            </tr>
+                            <tr>
+                                <td class="p-3"><code class="bg-purple-100 text-purple-800 px-2 py-1 rounded text-xs">data-swr-autoplay</code></td>
+                                <td class="p-3 text-gray-600">boolean</td>
+                                <td class="p-3 text-gray-600">false</td>
+                                <td class="p-3 text-gray-600">Enable autoplay</td>
+                            </tr>
+                            <tr class="bg-gray-50">
+                                <td class="p-3"><code class="bg-purple-100 text-purple-800 px-2 py-1 rounded text-xs">data-swr-autoplay-interval</code></td>
+                                <td class="p-3 text-gray-600">number</td>
+                                <td class="p-3 text-gray-600">5000</td>
+                                <td class="p-3 text-gray-600">Autoplay interval in milliseconds</td>
+                            </tr>
+                            <tr>
+                                <td class="p-3"><code class="bg-purple-100 text-purple-800 px-2 py-1 rounded text-xs">data-swr-keyboard</code></td>
+                                <td class="p-3 text-gray-600">boolean</td>
+                                <td class="p-3 text-gray-600">true</td>
+                                <td class="p-3 text-gray-600">Enable keyboard navigation</td>
+                            </tr>
+                            <tr class="bg-gray-50">
+                                <td class="p-3"><code class="bg-purple-100 text-purple-800 px-2 py-1 rounded text-xs">data-swr-touch</code></td>
+                                <td class="p-3 text-gray-600">boolean</td>
+                                <td class="p-3 text-gray-600">true</td>
+                                <td class="p-3 text-gray-600">Enable touch/swipe gestures</td>
+                            </tr>
+                            <tr>
+                                <td class="p-3"><code class="bg-purple-100 text-purple-800 px-2 py-1 rounded text-xs">data-swr-transition</code></td>
+                                <td class="p-3 text-gray-600">number</td>
+                                <td class="p-3 text-gray-600">350</td>
+                                <td class="p-3 text-gray-600">Transition duration in milliseconds</td>
+                            </tr>
+                            <tr class="bg-gray-50">
+                                <td class="p-3"><code class="bg-purple-100 text-purple-800 px-2 py-1 rounded text-xs">data-swr-swipe-threshold</code></td>
+                                <td class="p-3 text-gray-600">number</td>
+                                <td class="p-3 text-gray-600">50</td>
+                                <td class="p-3 text-gray-600">Minimum swipe distance in pixels</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Comparison -->
+        <section class="mb-8">
+            <div class="bg-white rounded-xl shadow-lg p-8">
+                <div class="mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-2">⚖️ Data Attributes vs JavaScript API</h2>
+                    <p class="text-gray-600">Choose the method that fits your project.</p>
+                </div>
+                
+                <div class="grid md:grid-cols-2 gap-6">
+                    <!-- Data Attributes -->
+                    <div class="border-2 border-purple-300 rounded-lg p-6">
+                        <h3 class="text-xl font-bold text-purple-600 mb-4">🏷️ Data Attributes</h3>
+                        <div class="space-y-3 mb-4">
+                            <div class="flex items-start">
+                                <span class="text-green-500 mr-2">✓</span>
+                                <span class="text-sm">No JavaScript knowledge needed</span>
+                            </div>
+                            <div class="flex items-start">
+                                <span class="text-green-500 mr-2">✓</span>
+                                <span class="text-sm">Declarative configuration</span>
+                            </div>
+                            <div class="flex items-start">
+                                <span class="text-green-500 mr-2">✓</span>
+                                <span class="text-sm">CMS-friendly</span>
+                            </div>
+                            <div class="flex items-start">
+                                <span class="text-green-500 mr-2">✓</span>
+                                <span class="text-sm">Static site generators</span>
+                            </div>
+                            <div class="flex items-start">
+                                <span class="text-red-500 mr-2">✗</span>
+                                <span class="text-sm">Limited dynamic control</span>
+                            </div>
+                            <div class="flex items-start">
+                                <span class="text-red-500 mr-2">✗</span>
+                                <span class="text-sm">No programmatic access</span>
+                            </div>
+                        </div>
+                        <div class="bg-purple-50 rounded-lg p-3">
+                            <p class="text-xs font-semibold text-purple-800 mb-2">Best For:</p>
+                            <p class="text-xs text-purple-700">WordPress, static sites, HTML-only projects, quick prototypes</p>
+                        </div>
+                    </div>
+
+                    <!-- JavaScript API -->
+                    <div class="border-2 border-blue-300 rounded-lg p-6">
+                        <h3 class="text-xl font-bold text-blue-600 mb-4">⚡ JavaScript API</h3>
+                        <div class="space-y-3 mb-4">
+                            <div class="flex items-start">
+                                <span class="text-green-500 mr-2">✓</span>
+                                <span class="text-sm">Full programmatic control</span>
+                            </div>
+                            <div class="flex items-start">
+                                <span class="text-green-500 mr-2">✓</span>
+                                <span class="text-sm">Dynamic content management</span>
+                            </div>
+                            <div class="flex items-start">
+                                <span class="text-green-500 mr-2">✓</span>
+                                <span class="text-sm">Event handling</span>
+                            </div>
+                            <div class="flex items-start">
+                                <span class="text-green-500 mr-2">✓</span>
+                                <span class="text-sm">Complex interactions</span>
+                            </div>
+                            <div class="flex items-start">
+                                <span class="text-red-500 mr-2">✗</span>
+                                <span class="text-sm">Requires JavaScript knowledge</span>
+                            </div>
+                            <div class="flex items-start">
+                                <span class="text-red-500 mr-2">✗</span>
+                                <span class="text-sm">More code to maintain</span>
+                            </div>
+                        </div>
+                        <div class="bg-blue-50 rounded-lg p-3">
+                            <p class="text-xs font-semibold text-blue-800 mb-2">Best For:</p>
+                            <p class="text-xs text-blue-700">SPAs, React/Vue apps, dynamic content, advanced features</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6 bg-green-50 border-l-4 border-green-500 p-4">
+                    <p class="text-sm text-green-800"><strong>Pro Tip:</strong> You can mix both methods! Initialize with data attributes and access the instance via JavaScript when needed.</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-8 mt-16">
+        <div class="container mx-auto px-4 text-center">
+            <p class="text-lg font-semibold mb-2">Built with ❤️ by SenangWebs Team</p>
+            <p class="text-gray-400">MIT License - Free to use in your projects</p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="../dist/swr.min.js"></script>
+    
+    <script>
+        // Auto-initialize all rolls with data-swr attribute
+        document.addEventListener('DOMContentLoaded', function() {
+            const rolls = document.querySelectorAll('[data-swr]');
+            rolls.forEach((roll, index) => {
+                // Initialize each roll
+                new SWR(roll);
+            });
+        });
+    </script>
+</body>
+</html>

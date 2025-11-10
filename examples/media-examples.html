@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Media Examples - SenangWebs Reel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../dist/swr.min.css">
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="gradient-bg text-white shadow-lg">
+        <div class="container mx-auto px-4 py-8">
+            <h1 class="text-4xl font-bold mb-2">🎥 Media Type Examples</h1>
+            <p class="text-lg opacity-90">Videos, Images & HTML Content</p>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4">
+            <ul class="flex space-x-1 overflow-x-auto py-3">
+                <li><a href="index.html" class="px-4 py-2 rounded-lg hover:bg-gray-100 text-gray-700 font-medium transition">Basic Examples</a></li>
+                <li><a href="advanced.html" class="px-4 py-2 rounded-lg hover:bg-gray-100 text-gray-700 font-medium transition">Advanced</a></li>
+                <li><a href="media-examples.html" class="px-4 py-2 rounded-lg bg-purple-600 text-white font-medium">Media Types</a></li>
+                <li><a href="responsive.html" class="px-4 py-2 rounded-lg hover:bg-gray-100 text-gray-700 font-medium transition">Responsive</a></li>
+                <li><a href="data-attributes.html" class="px-4 py-2 rounded-lg hover:bg-gray-100 text-gray-700 font-medium transition">Data Attributes</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        
+        <!-- Example 1: Image Gallery -->
+        <section class="mb-16">
+            <div class="bg-white rounded-xl shadow-lg p-8">
+                <div class="mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-2">🖼️ Image Gallery</h2>
+                    <p class="text-gray-600">Display images with alt text and titles.</p>
+                </div>
+                
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div>
+                        <div id="imageRoll" class="swr rounded-lg overflow-hidden shadow-md"></div>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-lg mb-3 text-gray-700">Image Configuration:</h3>
+                        <div class="bg-gray-50 rounded-lg p-4 border border-gray-200 mb-4">
+                            <pre class="text-sm font-mono text-gray-700 whitespace-pre-wrap">{
+  type: 'image',
+  src: 'path/to/image.jpg',
+  alt: 'Image description',
+  title: 'Image title'
+}</pre>
+                        </div>
+                        <ul class="space-y-2 text-gray-600">
+                            <li class="flex items-start">
+                                <span class="text-green-500 mr-2">✓</span>
+                                <span>Automatic image fitting and centering</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-green-500 mr-2">✓</span>
+                                <span>Support for alt text (accessibility)</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-green-500 mr-2">✓</span>
+                                <span>Responsive image scaling</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-green-500 mr-2">✓</span>
+                                <span>Works with placeholder services</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Example 2: Video Roll -->
+        <section class="mb-16">
+            <div class="bg-white rounded-xl shadow-lg p-8">
+                <div class="mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-2">🎬 Video Roll</h2>
+                    <p class="text-gray-600">Embed videos with autoplay, mute, and loop options.</p>
+                </div>
+                
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div>
+                        <div id="videoRoll" class="swr rounded-lg overflow-hidden shadow-md"></div>
+                        <div class="mt-4 bg-yellow-50 border-l-4 border-yellow-500 p-3">
+                            <p class="text-sm text-yellow-800"><strong>Note:</strong> Videos from placeholder sources may not play. Replace with your own video URLs for testing.</p>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-lg mb-3 text-gray-700">Video Configuration:</h3>
+                        <div class="bg-gray-50 rounded-lg p-4 border border-gray-200 mb-4">
+                            <pre class="text-sm font-mono text-gray-700 whitespace-pre-wrap">{
+  type: 'video',
+  src: 'path/to/video.mp4',
+  mimeType: 'video/mp4',
+  autoplay: true,
+  muted: true,
+  playsinline: true,
+  loop: false
+}</pre>
+                        </div>
+                        <ul class="space-y-2 text-gray-600">
+                            <li class="flex items-start">
+                                <span class="text-green-500 mr-2">✓</span>
+                                <span>Autoplay support (muted by default)</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-green-500 mr-2">✓</span>
+                                <span>Mobile-friendly with playsinline</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-green-500 mr-2">✓</span>
+                                <span>Multiple video format support</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-green-500 mr-2">✓</span>
+                                <span>Optional looping per video</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Example 3: HTML Content -->
+        <section class="mb-16">
+            <div class="bg-white rounded-xl shadow-lg p-8">
+                <div class="mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-2">📝 Custom HTML Content</h2>
+                    <p class="text-gray-600">Create rich, interactive slides with custom HTML and CSS.</p>
+                </div>
+                
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div>
+                        <div id="htmlRoll" class="swr rounded-lg overflow-hidden shadow-md"></div>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-lg mb-3 text-gray-700">HTML Configuration:</h3>
+                        <div class="bg-gray-50 rounded-lg p-4 border border-gray-200 mb-4">
+                            <pre class="text-sm font-mono text-gray-700 whitespace-pre-wrap">{
+  type: 'html',
+  content: '&lt;div&gt;...&lt;/div&gt;'
+}</pre>
+                        </div>
+                        <h4 class="font-semibold text-md mb-2 text-gray-700">Use Cases:</h4>
+                        <ul class="space-y-2 text-gray-600">
+                            <li class="flex items-start">
+                                <span class="text-blue-500 mr-2">•</span>
+                                <span>Product showcases with pricing</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-blue-500 mr-2">•</span>
+                                <span>Call-to-action slides</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-blue-500 mr-2">•</span>
+                                <span>Testimonials with avatars</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-blue-500 mr-2">•</span>
+                                <span>Feature lists and stats</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-blue-500 mr-2">•</span>
+                                <span>Interactive forms</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Example 4: Mixed Media -->
+        <section class="mb-16">
+            <div class="bg-white rounded-xl shadow-lg p-8">
+                <div class="mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-2">🎭 Mixed Media Roll</h2>
+                    <p class="text-gray-600">Combine images, videos, and HTML content in one roll.</p>
+                </div>
+                
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div>
+                        <div id="mixedRoll" class="swr rounded-lg overflow-hidden shadow-md"></div>
+                        <div id="mediaType" class="mt-3 text-center text-sm font-medium"></div>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-lg mb-3 text-gray-700">Mixed Media Features:</h3>
+                        <ul class="space-y-2 text-gray-600 mb-6">
+                            <li class="flex items-start">
+                                <span class="text-green-500 mr-2">✓</span>
+                                <span>Seamless transitions between different media types</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-green-500 mr-2">✓</span>
+                                <span>Automatic renderer selection</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-green-500 mr-2">✓</span>
+                                <span>Consistent behavior across all media</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-green-500 mr-2">✓</span>
+                                <span>Perfect for storytelling and presentations</span>
+                            </li>
+                        </ul>
+                        <div class="bg-blue-50 border-l-4 border-blue-500 p-4">
+                            <p class="text-sm text-blue-800"><strong>Pro Tip:</strong> Mix media types strategically to create engaging narratives. Start with an attention-grabbing image, follow with a video, then add HTML for context or CTA.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Example 5: Product Showcase -->
+        <section class="mb-8">
+            <div class="bg-white rounded-xl shadow-lg p-8">
+                <div class="mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-2">🛍️ Product Showcase Example</h2>
+                    <p class="text-gray-600">Real-world example: E-commerce product roll.</p>
+                </div>
+                
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div>
+                        <div id="productRoll" class="swr rounded-lg overflow-hidden shadow-md"></div>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-lg mb-3 text-gray-700">Perfect For:</h3>
+                        <ul class="space-y-2 text-gray-600 mb-6">
+                            <li class="flex items-start">
+                                <span class="text-purple-500 mr-2">🛒</span>
+                                <span>E-commerce product galleries</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-purple-500 mr-2">📱</span>
+                                <span>App feature showcases</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-purple-500 mr-2">🎨</span>
+                                <span>Portfolio presentations</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-purple-500 mr-2">📰</span>
+                                <span>News and article teasers</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-purple-500 mr-2">🏠</span>
+                                <span>Real estate listings</span>
+                            </li>
+                        </ul>
+                        <div class="bg-green-50 border-l-4 border-green-500 p-4">
+                            <p class="text-sm text-green-800"><strong>Interactive:</strong> Try swiping through this product showcase. Each slide can include images, descriptions, pricing, and call-to-action buttons.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-8 mt-16">
+        <div class="container mx-auto px-4 text-center">
+            <p class="text-lg font-semibold mb-2">Built with ❤️ by SenangWebs Team</p>
+            <p class="text-gray-400">MIT License - Free to use in your projects</p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="../dist/swr.min.js"></script>
+
+    <script>
+        // Example 1: Image Gallery
+        const imageRoll = new SWR('#imageRoll', {
+            aspectRatio: '9:16',
+            loop: true,
+            items: [
+                {
+                    type: 'image',
+                    src: 'https://picsum.photos/seed/img1/400/700',
+                    alt: 'Beautiful landscape'
+                },
+                {
+                    type: 'image',
+                    src: 'https://picsum.photos/seed/img2/400/700',
+                    alt: 'Nature photography'
+                },
+                {
+                    type: 'image',
+                    src: 'https://picsum.photos/seed/img3/400/700',
+                    alt: 'Urban scenery'
+                },
+                {
+                    type: 'image',
+                    src: 'https://picsum.photos/seed/img4/400/700',
+                    alt: 'Abstract art'
+                }
+            ]
+        });
+
+        // Example 2: Video Roll (using placeholder)
+        const videoRoll = new SWR('#videoRoll', {
+            aspectRatio: '9:16',
+            loop: true,
+            items: [
+                {
+                    type: 'html',
+                    content: '<div class="h-full bg-black flex items-center justify-center text-white p-8"><div class="text-center"><div class="text-6xl mb-4">🎥</div><h3 class="text-2xl font-bold mb-2">Video 1</h3><p class="text-sm text-gray-300">Replace with your video URL</p><p class="text-xs text-gray-500 mt-2">.mp4, .webm formats</p></div></div>'
+                },
+                {
+                    type: 'html',
+                    content: '<div class="h-full bg-gray-900 flex items-center justify-center text-white p-8"><div class="text-center"><div class="text-6xl mb-4">📹</div><h3 class="text-2xl font-bold mb-2">Video 2</h3><p class="text-sm text-gray-300">Autoplay & muted support</p><p class="text-xs text-gray-500 mt-2">Mobile-friendly playsinline</p></div></div>'
+                },
+                {
+                    type: 'html',
+                    content: '<div class="h-full bg-gray-800 flex items-center justify-center text-white p-8"><div class="text-center"><div class="text-6xl mb-4">🎬</div><h3 class="text-2xl font-bold mb-2">Video 3</h3><p class="text-sm text-gray-300">Loop & controls options</p><p class="text-xs text-gray-500 mt-2">Fully customizable</p></div></div>'
+                }
+            ]
+        });
+
+        // Example 3: HTML Content
+        const htmlRoll = new SWR('#htmlRoll', {
+            aspectRatio: '9:16',
+            autoplay: true,
+            autoplayInterval: 4000,
+            loop: true,
+            items: [
+                {
+                    type: 'html',
+                    content: `
+                        <div class="h-full bg-gradient-to-br from-blue-600 to-blue-800 text-white p-8 flex flex-col justify-between">
+                            <div>
+                                <div class="text-4xl mb-4">💼</div>
+                                <h3 class="text-2xl font-bold mb-3">Business Plan</h3>
+                                <p class="text-lg mb-6">Perfect for growing teams</p>
+                            </div>
+                            <div>
+                                <div class="text-5xl font-bold mb-4">$49<span class="text-xl">/mo</span></div>
+                                <ul class="space-y-2 mb-6 text-sm">
+                                    <li>✓ Unlimited projects</li>
+                                    <li>✓ 50 team members</li>
+                                    <li>✓ Priority support</li>
+                                </ul>
+                                <button class="w-full bg-white text-blue-600 font-bold py-3 rounded-lg hover:bg-gray-100 transition">Get Started</button>
+                            </div>
+                        </div>
+                    `
+                },
+                {
+                    type: 'html',
+                    content: `
+                        <div class="h-full bg-gradient-to-br from-purple-600 to-pink-600 text-white p-8 flex flex-col justify-center items-center text-center">
+                            <div class="mb-6">
+                                <img src="https://ui-avatars.com/api/?name=John+Doe&size=100&background=fff&color=9333ea" class="rounded-full mb-4 mx-auto" alt="John Doe">
+                                <p class="text-lg italic mb-4">"This product changed my workflow completely. Highly recommended!"</p>
+                                <p class="font-bold">— John Doe</p>
+                                <p class="text-sm opacity-80">CEO, Tech Corp</p>
+                            </div>
+                            <div class="flex gap-1 text-yellow-400">
+                                ⭐⭐⭐⭐⭐
+                            </div>
+                        </div>
+                    `
+                },
+                {
+                    type: 'html',
+                    content: `
+                        <div class="h-full bg-gradient-to-br from-green-600 to-teal-600 text-white p-8 flex flex-col justify-center">
+                            <h3 class="text-3xl font-bold mb-6 text-center">Key Features</h3>
+                            <div class="space-y-4">
+                                <div class="bg-white/10 backdrop-blur-sm rounded-lg p-4">
+                                    <div class="text-3xl mb-2">🚀</div>
+                                    <h4 class="font-bold text-lg mb-1">Fast Performance</h4>
+                                    <p class="text-sm opacity-90">Lightning quick load times</p>
+                                </div>
+                                <div class="bg-white/10 backdrop-blur-sm rounded-lg p-4">
+                                    <div class="text-3xl mb-2">🔒</div>
+                                    <h4 class="font-bold text-lg mb-1">Secure by Default</h4>
+                                    <p class="text-sm opacity-90">Enterprise-grade security</p>
+                                </div>
+                                <div class="bg-white/10 backdrop-blur-sm rounded-lg p-4">
+                                    <div class="text-3xl mb-2">📱</div>
+                                    <h4 class="font-bold text-lg mb-1">Mobile Ready</h4>
+                                    <p class="text-sm opacity-90">Works on all devices</p>
+                                </div>
+                            </div>
+                        </div>
+                    `
+                }
+            ]
+        });
+
+        // Example 4: Mixed Media
+        const mixedRoll = new SWR('#mixedRoll', {
+            aspectRatio: '9:16',
+            loop: true,
+            items: [
+                {
+                    type: 'image',
+                    src: 'https://picsum.photos/seed/mixed1/400/700',
+                    alt: 'Opening image'
+                },
+                {
+                    type: 'html',
+                    content: '<div class="h-full bg-gradient-to-br from-indigo-600 to-purple-700 flex items-center justify-center text-white p-8"><div class="text-center"><h2 class="text-4xl font-bold mb-4">Story Time</h2><p class="text-xl">Mix media types for engaging stories</p></div></div>'
+                },
+                {
+                    type: 'image',
+                    src: 'https://picsum.photos/seed/mixed2/400/700',
+                    alt: 'Second image'
+                },
+                {
+                    type: 'html',
+                    content: '<div class="h-full bg-gradient-to-br from-pink-500 to-rose-600 flex items-center justify-center text-white p-8"><div class="text-center"><div class="text-6xl mb-4">📖</div><h2 class="text-3xl font-bold mb-4">Chapter 2</h2><p class="text-lg">Keep your audience engaged</p></div></div>'
+                },
+                {
+                    type: 'image',
+                    src: 'https://picsum.photos/seed/mixed3/400/700',
+                    alt: 'Final image'
+                }
+            ]
+        });
+
+        function updateMediaType() {
+            const index = mixedRoll.getCurrentIndex();
+            const types = ['Image', 'HTML Content', 'Image', 'HTML Content', 'Image'];
+            const colors = ['text-blue-600', 'text-purple-600', 'text-blue-600', 'text-purple-600', 'text-blue-600'];
+            document.getElementById('mediaType').textContent = `Current: ${types[index]} (${index + 1}/5)`;
+            document.getElementById('mediaType').className = `mt-3 text-center text-sm font-medium ${colors[index]}`;
+        }
+
+        mixedRoll.on('navigationChanged', updateMediaType);
+        updateMediaType();
+
+        // Example 5: Product Showcase
+        const productRoll = new SWR('#productRoll', {
+            aspectRatio: '9:16',
+            loop: true,
+            items: [
+                {
+                    type: 'html',
+                    content: `
+                        <div class="h-full bg-white flex flex-col">
+                            <div class="flex-1 bg-gray-100 flex items-center justify-center">
+                                <img src="https://picsum.photos/seed/product1/300/300" alt="Product" class="max-w-[80%] max-h-[80%] object-contain">
+                            </div>
+                            <div class="p-6">
+                                <h3 class="text-2xl font-bold mb-2">Premium Headphones</h3>
+                                <div class="flex items-center mb-3">
+                                    <span class="text-3xl font-bold text-purple-600">$299</span>
+                                    <span class="text-gray-400 line-through ml-3">$399</span>
+                                </div>
+                                <p class="text-gray-600 text-sm mb-4">High-fidelity audio with noise cancellation</p>
+                                <button class="w-full bg-purple-600 text-white font-semibold py-3 rounded-lg">Add to Cart</button>
+                            </div>
+                        </div>
+                    `
+                },
+                {
+                    type: 'html',
+                    content: `
+                        <div class="h-full bg-white flex flex-col">
+                            <div class="flex-1 bg-gray-100 flex items-center justify-center">
+                                <img src="https://picsum.photos/seed/product2/300/300" alt="Product" class="max-w-[80%] max-h-[80%] object-contain">
+                            </div>
+                            <div class="p-6">
+                                <h3 class="text-2xl font-bold mb-2">Smart Watch Pro</h3>
+                                <div class="flex items-center mb-3">
+                                    <span class="text-3xl font-bold text-purple-600">$449</span>
+                                    <span class="bg-red-500 text-white text-xs px-2 py-1 rounded ml-3">25% OFF</span>
+                                </div>
+                                <p class="text-gray-600 text-sm mb-4">Track your fitness and stay connected</p>
+                                <button class="w-full bg-purple-600 text-white font-semibold py-3 rounded-lg">Add to Cart</button>
+                            </div>
+                        </div>
+                    `
+                },
+                {
+                    type: 'html',
+                    content: `
+                        <div class="h-full bg-white flex flex-col">
+                            <div class="flex-1 bg-gray-100 flex items-center justify-center">
+                                <img src="https://picsum.photos/seed/product3/300/300" alt="Product" class="max-w-[80%] max-h-[80%] object-contain">
+                            </div>
+                            <div class="p-6">
+                                <h3 class="text-2xl font-bold mb-2">Wireless Keyboard</h3>
+                                <div class="flex items-center mb-3">
+                                    <span class="text-3xl font-bold text-purple-600">$129</span>
+                                </div>
+                                <p class="text-gray-600 text-sm mb-4">Mechanical switches, RGB backlit</p>
+                                <button class="w-full bg-purple-600 text-white font-semibold py-3 rounded-lg">Add to Cart</button>
+                            </div>
+                        </div>
+                    `
+                }
+            ]
+        });
+    </script>
+</body>
+</html>

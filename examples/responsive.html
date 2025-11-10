@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Responsive Examples - SenangWebs Reel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../dist/swr.min.css">
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="gradient-bg text-white shadow-lg">
+        <div class="container mx-auto px-4 py-8">
+            <h1 class="text-4xl font-bold mb-2">📐 Responsive Examples</h1>
+            <p class="text-lg opacity-90">Different aspect ratios & responsive behavior</p>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4">
+            <ul class="flex space-x-1 overflow-x-auto py-3">
+                <li><a href="index.html" class="px-4 py-2 rounded-lg hover:bg-gray-100 text-gray-700 font-medium transition">Basic Examples</a></li>
+                <li><a href="advanced.html" class="px-4 py-2 rounded-lg hover:bg-gray-100 text-gray-700 font-medium transition">Advanced</a></li>
+                <li><a href="media-examples.html" class="px-4 py-2 rounded-lg hover:bg-gray-100 text-gray-700 font-medium transition">Media Types</a></li>
+                <li><a href="responsive.html" class="px-4 py-2 rounded-lg bg-purple-600 text-white font-medium">Responsive</a></li>
+                <li><a href="data-attributes.html" class="px-4 py-2 rounded-lg hover:bg-gray-100 text-gray-700 font-medium transition">Data Attributes</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        
+        <!-- Aspect Ratio Comparison -->
+        <section class="mb-16">
+            <div class="bg-white rounded-xl shadow-lg p-8">
+                <div class="mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-2">📱 Aspect Ratio Showcase</h2>
+                    <p class="text-gray-600">Compare different aspect ratios side by side.</p>
+                </div>
+                
+                <div class="grid lg:grid-cols-3 gap-8 mb-8">
+                    <!-- 9:16 Portrait -->
+                    <div>
+                        <h3 class="font-semibold text-lg mb-3 text-gray-700 text-center">9:16 (Mobile Stories)</h3>
+                        <div id="roll916" class="swr rounded-lg overflow-hidden shadow-md mx-auto max-w-xs"></div>
+                        <p class="text-sm text-gray-600 text-center mt-3">Perfect for Instagram Reels, TikTok, YouTube Shorts</p>
+                    </div>
+
+                    <!-- 1:1 Square -->
+                    <div>
+                        <h3 class="font-semibold text-lg mb-3 text-gray-700 text-center">1:1 (Square)</h3>
+                        <div id="roll11" class="swr rounded-lg overflow-hidden shadow-md mx-auto max-w-md"></div>
+                        <p class="text-sm text-gray-600 text-center mt-3">Ideal for Instagram posts, social media feeds</p>
+                    </div>
+
+                    <!-- 16:9 Landscape -->
+                    <div>
+                        <h3 class="font-semibold text-lg mb-3 text-gray-700 text-center">16:9 (Landscape)</h3>
+                        <div id="roll169" class="swr rounded-lg overflow-hidden shadow-md mx-auto max-w-md"></div>
+                        <p class="text-sm text-gray-600 text-center mt-3">Great for YouTube, presentations, widescreen</p>
+                    </div>
+                </div>
+
+                <div class="bg-blue-50 border-l-4 border-blue-500 p-4">
+                    <p class="text-sm text-blue-800"><strong>Tip:</strong> Choose aspect ratios based on your target platform and content type. Vertical (9:16) is best for mobile-first experiences.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Custom Aspect Ratios -->
+        <section class="mb-16">
+            <div class="bg-white rounded-xl shadow-lg p-8">
+                <div class="mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-2">🎨 Custom Aspect Ratios</h2>
+                    <p class="text-gray-600">Try unconventional aspect ratios for unique designs.</p>
+                </div>
+                
+                <div class="grid md:grid-cols-2 gap-8 mb-8">
+                    <!-- 4:3 Classic -->
+                    <div>
+                        <h3 class="font-semibold text-lg mb-3 text-gray-700">4:3 (Classic)</h3>
+                        <div id="roll43" class="swr rounded-lg overflow-hidden shadow-md"></div>
+                        <p class="text-sm text-gray-600 mt-3">Traditional TV and monitor ratio</p>
+                    </div>
+
+                    <!-- 21:9 Ultrawide -->
+                    <div>
+                        <h3 class="font-semibold text-lg mb-3 text-gray-700">21:9 (Ultrawide)</h3>
+                        <div id="roll219" class="swr rounded-lg overflow-hidden shadow-md"></div>
+                        <p class="text-sm text-gray-600 mt-3">Cinematic widescreen experience</p>
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                    <p class="text-sm font-mono text-gray-700">
+                        // Set custom aspect ratio:<br>
+                        new SWR('#roll', {<br>
+                        &nbsp;&nbsp;aspectRatio: '4:3'<br>
+                        });<br><br>
+                        // Supported formats: '16:9', '9:16', '4:3', '1:1', '21:9', etc.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Responsive Width Control -->
+        <section class="mb-16">
+            <div class="bg-white rounded-xl shadow-lg p-8">
+                <div class="mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-2">📏 Width & Container Control</h2>
+                    <p class="text-gray-600">Control roll width for different layouts.</p>
+                </div>
+                
+                <div class="space-y-8">
+                    <!-- Small Width -->
+                    <div>
+                        <h3 class="font-semibold text-md mb-3 text-gray-700">Small (300px max)</h3>
+                        <div class="flex justify-center">
+                            <div id="rollSmall" class="swr rounded-lg overflow-hidden shadow-md" style="max-width: 300px;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Medium Width -->
+                    <div>
+                        <h3 class="font-semibold text-md mb-3 text-gray-700">Medium (500px max)</h3>
+                        <div class="flex justify-center">
+                            <div id="rollMedium" class="swr rounded-lg overflow-hidden shadow-md" style="max-width: 500px;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Full Width -->
+                    <div>
+                        <h3 class="font-semibold text-md mb-3 text-gray-700">Full Width</h3>
+                        <div id="rollFull" class="swr rounded-lg overflow-hidden shadow-md"></div>
+                    </div>
+                </div>
+
+                <div class="mt-6 bg-purple-50 border-l-4 border-purple-500 p-4">
+                    <p class="text-sm text-purple-800"><strong>Note:</strong> Use CSS to control Roll Container width. The roll automatically adapts to its container size.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Mobile vs Desktop -->
+        <section class="mb-16">
+            <div class="bg-white rounded-xl shadow-lg p-8">
+                <div class="mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-2">💻📱 Responsive Breakpoints</h2>
+                    <p class="text-gray-600">Adapt to different screen sizes seamlessly.</p>
+                </div>
+                
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div>
+                        <div id="responsiveRoll" class="swr rounded-lg overflow-hidden shadow-md"></div>
+                        <div id="screenInfo" class="mt-4 text-center p-3 bg-gray-100 rounded-lg">
+                            <p class="font-semibold text-gray-700">Current Screen: <span id="screenSize"></span></p>
+                            <p class="text-sm text-gray-600 mt-1">Resize your browser to see responsive behavior</p>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-lg mb-3 text-gray-700">Responsive Features:</h3>
+                        <ul class="space-y-2 text-gray-600 mb-6">
+                            <li class="flex items-start">
+                                <span class="text-green-500 mr-2">✓</span>
+                                <span>Touch gestures on mobile devices</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-green-500 mr-2">✓</span>
+                                <span>Keyboard navigation on desktop</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-green-500 mr-2">✓</span>
+                                <span>Fluid aspect ratio scaling</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-green-500 mr-2">✓</span>
+                                <span>Optimized performance per device</span>
+                            </li>
+                        </ul>
+
+                        <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                            <h4 class="font-semibold text-sm mb-3">Breakpoint Detection</h4>
+                            <div class="text-sm text-gray-600 space-y-2">
+                                <div class="flex items-center justify-between">
+                                    <span>📱 Mobile:</span>
+                                    <span class="font-mono">&lt; 768px</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span>💻 Tablet:</span>
+                                    <span class="font-mono">768px - 1024px</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span>🖥️ Desktop:</span>
+                                    <span class="font-mono">&gt; 1024px</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Multi-Column Layout -->
+        <section class="mb-8">
+            <div class="bg-white rounded-xl shadow-lg p-8">
+                <div class="mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-2">🎯 Multi-Column Layout</h2>
+                    <p class="text-gray-600">Multiple rolls in a responsive grid.</p>
+                </div>
+                
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+                    <div>
+                        <h4 class="font-semibold text-sm mb-3 text-gray-700">Roll A</h4>
+                        <div id="multiA" class="swr rounded-lg overflow-hidden shadow-md"></div>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-sm mb-3 text-gray-700">Roll B</h4>
+                        <div id="multiB" class="swr rounded-lg overflow-hidden shadow-md"></div>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-sm mb-3 text-gray-700">Roll C</h4>
+                        <div id="multiC" class="swr rounded-lg overflow-hidden shadow-md"></div>
+                    </div>
+                </div>
+
+                <div class="bg-green-50 border-l-4 border-green-500 p-4">
+                    <p class="text-sm text-green-800"><strong>Use Case:</strong> Perfect for dashboards, portfolio grids, or product comparison pages. Each roll operates independently.</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-8 mt-16">
+        <div class="container mx-auto px-4 text-center">
+            <p class="text-lg font-semibold mb-2">Built with ❤️ by SenangWebs Team</p>
+            <p class="text-gray-400">MIT License - Free to use in your projects</p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="../dist/swr.min.js"></script>
+
+    <script>
+        // Aspect Ratio Examples
+        // 9:16 Portrait
+        new SWR('#roll916', {
+            aspectRatio: '9:16',
+            loop: true,
+            items: [
+                { type: 'html', content: '<div class="h-full bg-gradient-to-br from-blue-500 to-blue-700 flex flex-col items-center justify-center text-white p-6"><div class="text-5xl mb-3">📱</div><h3 class="text-2xl font-bold mb-2">9:16</h3><p>Mobile Stories</p></div>' },
+                { type: 'html', content: '<div class="h-full bg-gradient-to-br from-purple-500 to-purple-700 flex flex-col items-center justify-center text-white p-6"><div class="text-5xl mb-3">📲</div><h3 class="text-2xl font-bold mb-2">Portrait</h3><p>Vertical Video</p></div>' }
+            ]
+        });
+
+        // 1:1 Square
+        new SWR('#roll11', {
+            aspectRatio: '1:1',
+            loop: true,
+            items: [
+                { type: 'html', content: '<div class="h-full bg-gradient-to-br from-green-500 to-green-700 flex flex-col items-center justify-center text-white p-6"><div class="text-5xl mb-3">◼️</div><h3 class="text-2xl font-bold mb-2">1:1</h3><p>Square Format</p></div>' },
+                { type: 'html', content: '<div class="h-full bg-gradient-to-br from-teal-500 to-teal-700 flex flex-col items-center justify-center text-white p-6"><div class="text-5xl mb-3">⬜</div><h3 class="text-2xl font-bold mb-2">Perfect Square</h3><p>Instagram Feed</p></div>' }
+            ]
+        });
+
+        // 16:9 Landscape
+        new SWR('#roll169', {
+            aspectRatio: '16:9',
+            loop: true,
+            items: [
+                { type: 'html', content: '<div class="h-full bg-gradient-to-r from-red-500 to-pink-600 flex items-center justify-center text-white p-6"><div class="text-center"><div class="text-5xl mb-3">🖥️</div><h3 class="text-2xl font-bold mb-2">16:9</h3><p>Widescreen</p></div></div>' },
+                { type: 'html', content: '<div class="h-full bg-gradient-to-r from-orange-500 to-red-600 flex items-center justify-center text-white p-6"><div class="text-center"><div class="text-5xl mb-3">📺</div><h3 class="text-2xl font-bold mb-2">Landscape</h3><p>YouTube Standard</p></div></div>' }
+            ]
+        });
+
+        // Custom Aspect Ratios
+        // 4:3 Classic
+        new SWR('#roll43', {
+            aspectRatio: '4:3',
+            loop: true,
+            autoplay: true,
+            autoplayInterval: 3000,
+            items: [
+                { type: 'html', content: '<div class="h-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white"><div class="text-center"><div class="text-5xl mb-3">📺</div><h3 class="text-3xl font-bold">4:3</h3></div></div>' },
+                { type: 'html', content: '<div class="h-full bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center text-white"><div class="text-center"><div class="text-5xl mb-3">🎥</div><h3 class="text-3xl font-bold">Classic</h3></div></div>' }
+            ]
+        });
+
+        // 21:9 Ultrawide
+        new SWR('#roll219', {
+            aspectRatio: '21:9',
+            loop: true,
+            autoplay: true,
+            autoplayInterval: 3000,
+            items: [
+                { type: 'html', content: '<div class="h-full bg-gradient-to-r from-blue-600 to-cyan-600 flex items-center justify-center text-white"><div class="text-center"><div class="text-5xl mb-3">🎬</div><h3 class="text-3xl font-bold">21:9 Cinematic</h3></div></div>' },
+                { type: 'html', content: '<div class="h-full bg-gradient-to-r from-cyan-600 to-teal-600 flex items-center justify-center text-white"><div class="text-center"><div class="text-5xl mb-3">🎞️</div><h3 class="text-3xl font-bold">Ultrawide</h3></div></div>' }
+            ]
+        });
+
+        // Width Control Examples
+        new SWR('#rollSmall', {
+            aspectRatio: '9:16',
+            loop: true,
+            items: [
+                { type: 'html', content: '<div class="h-full bg-gradient-to-br from-pink-500 to-rose-600 flex items-center justify-center text-white text-center p-4"><div><div class="text-4xl mb-2">💎</div><p class="text-lg font-bold">Small</p></div></div>' },
+                { type: 'html', content: '<div class="h-full bg-gradient-to-br from-rose-500 to-red-600 flex items-center justify-center text-white text-center p-4"><div><div class="text-4xl mb-2">✨</div><p class="text-lg font-bold">300px</p></div></div>' }
+            ]
+        });
+
+        new SWR('#rollMedium', {
+            aspectRatio: '9:16',
+            loop: true,
+            items: [
+                { type: 'html', content: '<div class="h-full bg-gradient-to-br from-yellow-500 to-orange-600 flex items-center justify-center text-white text-center p-4"><div><div class="text-5xl mb-2">🌟</div><p class="text-xl font-bold">Medium</p></div></div>' },
+                { type: 'html', content: '<div class="h-full bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center text-white text-center p-4"><div><div class="text-5xl mb-2">⚡</div><p class="text-xl font-bold">500px</p></div></div>' }
+            ]
+        });
+
+        new SWR('#rollFull', {
+            aspectRatio: '21:9',
+            loop: true,
+            autoplay: true,
+            autoplayInterval: 3500,
+            items: [
+                { type: 'html', content: '<div class="h-full bg-gradient-to-r from-blue-600 to-purple-700 flex items-center justify-center text-white text-center"><div><div class="text-6xl mb-3">🌈</div><h3 class="text-3xl font-bold">Full Width Roll</h3><p class="text-lg mt-2">Spans entire container</p></div></div>' },
+                { type: 'html', content: '<div class="h-full bg-gradient-to-r from-purple-600 to-pink-700 flex items-center justify-center text-white text-center"><div><div class="text-6xl mb-3">✨</div><h3 class="text-3xl font-bold">Responsive Design</h3><p class="text-lg mt-2">Adapts to screen size</p></div></div>' }
+            ]
+        });
+
+        // Responsive Roll with screen detection
+        const responsiveRoll = new SWR('#responsiveRoll', {
+            aspectRatio: '9:16',
+            loop: true,
+            items: [
+                { type: 'html', content: '<div class="h-full bg-gradient-to-br from-indigo-500 to-blue-600 flex flex-col items-center justify-center text-white p-8"><div class="text-6xl mb-4">📱</div><h3 class="text-3xl font-bold mb-2">Responsive</h3><p class="text-lg">Works everywhere</p></div>' },
+                { type: 'html', content: '<div class="h-full bg-gradient-to-br from-blue-500 to-cyan-600 flex flex-col items-center justify-center text-white p-8"><div class="text-6xl mb-4">💻</div><h3 class="text-3xl font-bold mb-2">Adaptive</h3><p class="text-lg">All devices</p></div>' },
+                { type: 'html', content: '<div class="h-full bg-gradient-to-br from-cyan-500 to-teal-600 flex flex-col items-center justify-center text-white p-8"><div class="text-6xl mb-4">🖥️</div><h3 class="text-3xl font-bold mb-2">Flexible</h3><p class="text-lg">Any screen size</p></div>' }
+            ]
+        });
+
+        function updateScreenInfo() {
+            const width = window.innerWidth;
+            let size = '';
+            
+            if (width < 768) {
+                size = '📱 Mobile (< 768px)';
+            } else if (width < 1024) {
+                size = '💻 Tablet (768px - 1024px)';
+            } else {
+                size = '🖥️ Desktop (> 1024px)';
+            }
+            
+            document.getElementById('screenSize').textContent = size;
+        }
+
+        updateScreenInfo();
+        window.addEventListener('resize', updateScreenInfo);
+
+        // Multi-column rolls
+        const colors = [
+            { from: 'red-500', to: 'pink-600' },
+            { from: 'blue-500', to: 'indigo-600' },
+            { from: 'green-500', to: 'teal-600' }
+        ];
+
+        ['A', 'B', 'C'].forEach((letter, idx) => {
+            new SWR(`#multi${letter}`, {
+                aspectRatio: '9:16',
+                loop: true,
+                items: [
+                    { 
+                        type: 'html', 
+                        content: `<div class="h-full bg-gradient-to-br from-${colors[idx].from} to-${colors[idx].to} flex flex-col items-center justify-center text-white p-6"><div class="text-5xl mb-3">${['🎨', '🎭', '🎪'][idx]}</div><h3 class="text-2xl font-bold mb-2">Roll ${letter}</h3><p>Slide 1</p></div>` 
+                    },
+                    { 
+                        type: 'html', 
+                        content: `<div class="h-full bg-gradient-to-br from-${colors[idx].to} to-${colors[idx].from} flex flex-col items-center justify-center text-white p-6"><div class="text-5xl mb-3">${['🎯', '🎲', '🎮'][idx]}</div><h3 class="text-2xl font-bold mb-2">Roll ${letter}</h3><p>Slide 2</p></div>` 
+                    }
+                ]
+            });
+        });
+    </script>
+</body>
+</html>

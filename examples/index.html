@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SenangWebs Reel - Examples Gallery</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../dist/swr.min.css" />
+    <style>
+      .gradient-bg {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      }
+    </style>
+  </head>
+  <body class="bg-gray-50">
+    <!-- Header -->
+    <header class="gradient-bg text-white shadow-lg">
+      <div class="container mx-auto px-4 py-8">
+        <h1 class="text-4xl font-bold mb-2">🎬 SenangWebs Reel</h1>
+        <p class="text-lg opacity-90">Comprehensive Examples Gallery</p>
+      </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="bg-white shadow-md sticky top-0 z-50">
+      <div class="container mx-auto px-4">
+        <ul class="flex space-x-1 overflow-x-auto py-3">
+          <li>
+            <a
+              href="index.html"
+              class="px-4 py-2 rounded-lg bg-purple-600 text-white font-medium"
+              >Basic Examples</a
+            >
+          </li>
+          <li>
+            <a
+              href="advanced.html"
+              class="px-4 py-2 rounded-lg hover:bg-gray-100 text-gray-700 font-medium transition"
+              >Advanced</a
+            >
+          </li>
+          <li>
+            <a
+              href="media-examples.html"
+              class="px-4 py-2 rounded-lg hover:bg-gray-100 text-gray-700 font-medium transition"
+              >Media Types</a
+            >
+          </li>
+          <li>
+            <a
+              href="responsive.html"
+              class="px-4 py-2 rounded-lg hover:bg-gray-100 text-gray-700 font-medium transition"
+              >Responsive</a
+            >
+          </li>
+          <li>
+            <a
+              href="data-attributes.html"
+              class="px-4 py-2 rounded-lg hover:bg-gray-100 text-gray-700 font-medium transition"
+              >Data Attributes</a
+            >
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+      <!-- Example 1: Basic Roll -->
+      <section class="mb-16">
+        <div class="bg-white rounded-xl shadow-lg p-8">
+          <div class="mb-6">
+            <h2 class="text-2xl font-bold text-gray-800 mb-2">📱 Basic Roll</h2>
+            <p class="text-gray-600">
+              Simple roll with manual navigation using arrow keys or swipe
+              gestures.
+            </p>
+          </div>
+
+          <div class="grid md:grid-cols-4 gap-8">
+            <div>
+              <div
+                id="basicRoll"
+                class="swr rounded-lg overflow-hidden shadow-md"
+              ></div>
+            </div>
+            <div>
+              <h3 class="font-semibold text-lg mb-3 text-gray-700">
+                Features:
+              </h3>
+              <ul class="space-y-2 text-gray-600 mb-6">
+                <li class="flex items-start">
+                  <span class="text-green-500 mr-2">✓</span>
+                  <span>Keyboard navigation (Arrow Up/Down)</span>
+                </li>
+                <li class="flex items-start">
+                  <span class="text-green-500 mr-2">✓</span>
+                  <span>Touch/swipe gestures (up/down)</span>
+                </li>
+                <li class="flex items-start">
+                  <span class="text-green-500 mr-2">✓</span>
+                  <span>Mouse wheel support (desktop)</span>
+                </li>
+                <li class="flex items-start">
+                  <span class="text-green-500 mr-2">✓</span>
+                  <span>Smooth transitions</span>
+                </li>
+                <li class="flex items-start">
+                  <span class="text-green-500 mr-2">✓</span>
+                  <span>9:16 aspect ratio (mobile-friendly)</span>
+                </li>
+              </ul>
+              <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                <p class="text-sm font-mono text-gray-700">
+                  new SWR('#basicRoll', {<br />
+                  &nbsp;&nbsp;aspectRatio: '9:16',<br />
+                  &nbsp;&nbsp;enableKeyboard: true,<br />
+                  &nbsp;&nbsp;enableTouch: true<br />
+                  });
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Example 2: Autoplay Roll -->
+      <section class="mb-16">
+        <div class="bg-white rounded-xl shadow-lg p-8">
+          <div class="mb-6">
+            <h2 class="text-2xl font-bold text-gray-800 mb-2">
+              ▶️ Autoplay Roll
+            </h2>
+            <p class="text-gray-600">
+              Automatically cycles through items with customizable interval.
+            </p>
+          </div>
+
+          <div class="grid md:grid-cols-4 gap-8">
+            <div>
+              <div
+                id="autoplayRoll"
+                class="swr rounded-lg overflow-hidden shadow-md"
+              ></div>
+              <div class="mt-4 flex gap-3">
+                <button
+                  id="playBtn"
+                  class="flex-1 bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-6 rounded-lg transition"
+                >
+                  ▶️ Play
+                </button>
+                <button
+                  id="pauseBtn"
+                  class="flex-1 bg-red-500 hover:bg-red-600 text-white font-semibold py-3 px-6 rounded-lg transition"
+                >
+                  ⏸️ Pause
+                </button>
+              </div>
+              <div
+                id="autoplayStatus"
+                class="mt-3 text-center text-sm font-medium text-gray-600"
+              ></div>
+            </div>
+            <div>
+              <h3 class="font-semibold text-lg mb-3 text-gray-700">
+                Features:
+              </h3>
+              <ul class="space-y-2 text-gray-600 mb-6">
+                <li class="flex items-start">
+                  <span class="text-green-500 mr-2">✓</span>
+                  <span>Automatic slide progression</span>
+                </li>
+                <li class="flex items-start">
+                  <span class="text-green-500 mr-2">✓</span>
+                  <span>Pause on interaction</span>
+                </li>
+                <li class="flex items-start">
+                  <span class="text-green-500 mr-2">✓</span>
+                  <span>Auto-resume after delay</span>
+                </li>
+                <li class="flex items-start">
+                  <span class="text-green-500 mr-2">✓</span>
+                  <span>Programmatic play/pause control</span>
+                </li>
+              </ul>
+              <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                <p class="text-sm font-mono text-gray-700">
+                  new SWR('#autoplayRoll', {<br />
+                  &nbsp;&nbsp;autoplay: true,<br />
+                  &nbsp;&nbsp;autoplayInterval: 3000,<br />
+                  &nbsp;&nbsp;enableAutoplayPauseOnInteraction: true<br />
+                  });
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Example 3: Looping Roll -->
+      <section class="mb-16">
+        <div class="bg-white rounded-xl shadow-lg p-8">
+          <div class="mb-6">
+            <h2 class="text-2xl font-bold text-gray-800 mb-2">
+              🔄 Infinite Loop Roll
+            </h2>
+            <p class="text-gray-600">
+              Seamlessly loops from the last item back to the first (and vice
+              versa).
+            </p>
+          </div>
+
+          <div class="grid md:grid-cols-4 gap-8">
+            <div>
+              <div
+                id="loopRoll"
+                class="swr rounded-lg overflow-hidden shadow-md"
+              ></div>
+              <div class="mt-4 grid grid-cols-3 gap-3">
+                <button
+                  id="prevBtn"
+                  class="bg-purple-500 hover:bg-purple-600 text-white font-semibold py-3 px-4 rounded-lg transition"
+                >
+                  ← Prev
+                </button>
+                <button
+                  id="nextBtn"
+                  class="bg-purple-500 hover:bg-purple-600 text-white font-semibold py-3 px-4 rounded-lg transition"
+                >
+                  Next →
+                </button>
+                <button
+                  id="jumpBtn"
+                  class="bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-3 px-4 rounded-lg transition"
+                >
+                  Jump to 3
+                </button>
+              </div>
+              <div
+                id="loopStatus"
+                class="mt-3 text-center text-sm font-medium text-gray-600"
+              ></div>
+            </div>
+            <div>
+              <h3 class="font-semibold text-lg mb-3 text-gray-700">
+                Features:
+              </h3>
+              <ul class="space-y-2 text-gray-600 mb-6">
+                <li class="flex items-start">
+                  <span class="text-green-500 mr-2">✓</span>
+                  <span>Infinite looping navigation</span>
+                </li>
+                <li class="flex items-start">
+                  <span class="text-green-500 mr-2">✓</span>
+                  <span>No dead ends at first/last item</span>
+                </li>
+                <li class="flex items-start">
+                  <span class="text-green-500 mr-2">✓</span>
+                  <span>Direct navigation to any slide</span>
+                </li>
+                <li class="flex items-start">
+                  <span class="text-green-500 mr-2">✓</span>
+                  <span>Manual control buttons</span>
+                </li>
+              </ul>
+              <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                <p class="text-sm font-mono text-gray-700">
+                  new SWR('#loopRoll', {<br />
+                  &nbsp;&nbsp;loop: true,<br />
+                  &nbsp;&nbsp;aspectRatio: '9:16'<br />
+                  });<br /><br />
+                  // Navigation methods:<br />
+                  roll.prev();<br />
+                  roll.next();<br />
+                  roll.goTo(2);
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Quick Reference -->
+      <section class="mb-8">
+        <div
+          class="bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl shadow-lg p-8 text-white"
+        >
+          <h2 class="text-2xl font-bold mb-4">🎯 Quick Reference</h2>
+          <div class="grid md:grid-cols-4 gap-6">
+            <div class="bg-white/10 rounded-lg p-4 backdrop-blur-sm">
+              <h3 class="font-semibold mb-2">Keyboard Controls</h3>
+              <ul class="text-sm space-y-1">
+                <li>↓ Next slide</li>
+                <li>↑ Previous slide</li>
+                <li>Space: Toggle autoplay</li>
+              </ul>
+            </div>
+            <div class="bg-white/10 rounded-lg p-4 backdrop-blur-sm">
+              <h3 class="font-semibold mb-2">Touch Gestures</h3>
+              <ul class="text-sm space-y-1">
+                <li>Swipe up: Next</li>
+                <li>Swipe down: Previous</li>
+                <li>Tap: Pause autoplay</li>
+              </ul>
+            </div>
+            <div class="bg-white/10 rounded-lg p-4 backdrop-blur-sm">
+              <h3 class="font-semibold mb-2">Mouse/Desktop</h3>
+              <ul class="text-sm space-y-1">
+                <li>Scroll down: Next</li>
+                <li>Scroll up: Previous</li>
+                <li>Works with trackpad</li>
+              </ul>
+            </div>
+            <div class="bg-white/10 rounded-lg p-4 backdrop-blur-sm">
+              <h3 class="font-semibold mb-2">Core Methods</h3>
+              <ul class="text-sm space-y-1">
+                <li>roll.next()</li>
+                <li>roll.prev()</li>
+                <li>roll.goTo(index)</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-8 mt-16">
+      <div class="container mx-auto px-4 text-center">
+        <p class="text-lg font-semibold mb-2">
+          Built with ❤️ by SenangWebs Team
+        </p>
+        <p class="text-gray-400">MIT License - Free to use in your projects</p>
+      </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="../dist/swr.min.js"></script>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        // Example 1: Basic Roll
+        const basicRoll = new SWR("#basicRoll", {
+          aspectRatio: "9:16",
+          enableKeyboard: true,
+          enableTouch: true,
+          items: [
+            {
+              type: "html",
+              content:
+                '<div class="h-full bg-gradient-to-br from-blue-500 to-blue-700 flex flex-col items-center justify-center text-white p-8"><h1 class="text-4xl font-bold mb-4">Slide 1</h1><p class="text-xl">Basic Roll Example</p></div>',
+            },
+            {
+              type: "html",
+              content:
+                '<div class="h-full bg-gradient-to-br from-green-500 to-green-700 flex flex-col items-center justify-center text-white p-8"><h1 class="text-4xl font-bold mb-4">Slide 2</h1><p class="text-xl">Use arrow keys or swipe</p></div>',
+            },
+            {
+              type: "html",
+              content:
+                '<div class="h-full bg-gradient-to-br from-purple-500 to-purple-700 flex flex-col items-center justify-center text-white p-8"><h1 class="text-4xl font-bold mb-4">Slide 3</h1><p class="text-xl">Navigate easily</p></div>',
+            },
+            {
+              type: "html",
+              content:
+                '<div class="h-full bg-gradient-to-br from-pink-500 to-pink-700 flex flex-col items-center justify-center text-white p-8"><h1 class="text-4xl font-bold mb-4">Slide 4</h1><p class="text-xl">Smooth transitions</p></div>',
+            },
+          ],
+        });
+
+        // Example 2: Autoplay Roll
+        const autoplayRoll = new SWR("#autoplayRoll", {
+          aspectRatio: "9:16",
+          autoplay: true,
+          autoplayInterval: 3000,
+          enableAutoplayPauseOnInteraction: true,
+          autoplayResumeDelay: 2000,
+          items: [
+            {
+              type: "html",
+              content:
+                '<div class="h-full bg-gradient-to-br from-orange-500 to-red-600 flex flex-col items-center justify-center text-white p-8"><div class="text-6xl mb-4">🚀</div><h1 class="text-3xl font-bold mb-2">Autoplay Active</h1><p class="text-lg">Slides change automatically</p></div>',
+            },
+            {
+              type: "html",
+              content:
+                '<div class="h-full bg-gradient-to-br from-teal-500 to-cyan-600 flex flex-col items-center justify-center text-white p-8"><div class="text-6xl mb-4">⏱️</div><h1 class="text-3xl font-bold mb-2">Every 3 Seconds</h1><p class="text-lg">Customizable timing</p></div>',
+            },
+            {
+              type: "html",
+              content:
+                '<div class="h-full bg-gradient-to-br from-indigo-500 to-purple-600 flex flex-col items-center justify-center text-white p-8"><div class="text-6xl mb-4">✋</div><h1 class="text-3xl font-bold mb-2">Pause on Touch</h1><p class="text-lg">Resumes automatically</p></div>',
+            },
+          ],
+        });
+
+        // Autoplay controls
+        document.getElementById("playBtn").addEventListener("click", () => {
+          autoplayRoll.play();
+        });
+
+        document.getElementById("pauseBtn").addEventListener("click", () => {
+          autoplayRoll.pause();
+        });
+
+        // Status display
+        autoplayRoll.on("autoplayStart", () => {
+          document.getElementById("autoplayStatus").textContent =
+            "▶️ Autoplay is running";
+          document.getElementById("autoplayStatus").className =
+            "mt-3 text-center text-sm font-medium text-green-600";
+        });
+
+        autoplayRoll.on("autoplayPause", () => {
+          document.getElementById("autoplayStatus").textContent =
+            "⏸️ Autoplay is paused";
+          document.getElementById("autoplayStatus").className =
+            "mt-3 text-center text-sm font-medium text-red-600";
+        });
+
+        // Example 3: Looping Roll
+        const loopRoll = new SWR("#loopRoll", {
+          aspectRatio: "9:16",
+          loop: true,
+          items: [
+            {
+              type: "html",
+              content:
+                '<div class="h-full bg-gradient-to-br from-yellow-400 to-orange-500 flex flex-col items-center justify-center text-white p-8"><div class="text-7xl font-bold mb-4">1</div><h1 class="text-3xl font-bold">First Slide</h1></div>',
+            },
+            {
+              type: "html",
+              content:
+                '<div class="h-full bg-gradient-to-br from-red-400 to-pink-500 flex flex-col items-center justify-center text-white p-8"><div class="text-7xl font-bold mb-4">2</div><h1 class="text-3xl font-bold">Second Slide</h1></div>',
+            },
+            {
+              type: "html",
+              content:
+                '<div class="h-full bg-gradient-to-br from-blue-400 to-indigo-500 flex flex-col items-center justify-center text-white p-8"><div class="text-7xl font-bold mb-4">3</div><h1 class="text-3xl font-bold">Third Slide</h1></div>',
+            },
+            {
+              type: "html",
+              content:
+                '<div class="h-full bg-gradient-to-br from-green-400 to-teal-500 flex flex-col items-center justify-center text-white p-8"><div class="text-7xl font-bold mb-4">4</div><h1 class="text-3xl font-bold">Fourth Slide</h1></div>',
+            },
+            {
+              type: "html",
+              content:
+                '<div class="h-full bg-gradient-to-br from-purple-400 to-pink-500 flex flex-col items-center justify-center text-white p-8"><div class="text-7xl font-bold mb-4">5</div><h1 class="text-3xl font-bold">Last Slide</h1></div>',
+            },
+          ],
+        });
+
+        // Loop controls
+        document.getElementById("prevBtn").addEventListener("click", () => {
+          loopRoll.prev();
+        });
+
+        document.getElementById("nextBtn").addEventListener("click", () => {
+          loopRoll.next();
+        });
+
+        document.getElementById("jumpBtn").addEventListener("click", () => {
+          loopRoll.goTo(2); // Jump to slide 3 (index 2)
+        });
+
+        // Status display for loop
+        function updateLoopStatus() {
+          const current = loopRoll.getCurrentIndex() + 1;
+          const total = loopRoll.getTotalItems();
+          document.getElementById(
+            "loopStatus"
+          ).textContent = `Slide ${current} of ${total}`;
+        }
+
+        loopRoll.on("navigationChanged", updateLoopStatus);
+        updateLoopStatus();
+      });
+    </script>
+  </body>
+</html>
