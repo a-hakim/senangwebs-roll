@@ -457,15 +457,5 @@
     <!-- Scripts -->
     <script src="../dist/swr.min.js"></script>
     
-    <script>
-        // Auto-initialize all rolls with data-swr attribute
-        document.addEventListener('DOMContentLoaded', function() {
-            const rolls = document.querySelectorAll('[data-swr]');
-            rolls.forEach((roll, index) => {
-                // Initialize each roll
-                new SWR(roll);
-            });
-        });
-    </script>
 </body>
 </html>
