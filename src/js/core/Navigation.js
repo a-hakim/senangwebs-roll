@@ -20,42 +20,56 @@ class Navigation {
 
   /**
    * Go to next item
-   * @returns {number} New index
+   * @returns {Object} Navigation result {index, isWrapping, direction}
    */
   next() {
-    if (this.totalItems === 0) return this.currentIndex;
+    if (this.totalItems === 0) return { index: this.currentIndex, isWrapping: false, direction: 'up' };
 
     let nextIndex = this.currentIndex + 1;
+    let isWrapping = false;
 
     if (nextIndex >= this.totalItems) {
       if (this.config.loop) {
         nextIndex = 0;
+        isWrapping = true;
       } else {
         nextIndex = this.totalItems - 1;
       }
     }
 
-    return this.goTo(nextIndex);
+    const result = this.goTo(nextIndex);
+    return {
+      index: result,
+      isWrapping: isWrapping,
+      direction: 'up'
+    };
   }
 
   /**
    * Go to previous item
-   * @returns {number} New index
+   * @returns {Object} Navigation result {index, isWrapping, direction}
    */
   prev() {
-    if (this.totalItems === 0) return this.currentIndex;
+    if (this.totalItems === 0) return { index: this.currentIndex, isWrapping: false, direction: 'down' };
 
     let prevIndex = this.currentIndex - 1;
+    let isWrapping = false;
 
     if (prevIndex < 0) {
       if (this.config.loop) {
         prevIndex = this.totalItems - 1;
+        isWrapping = true;
       } else {
         prevIndex = 0;
       }
     }
 
-    return this.goTo(prevIndex);
+    const result = this.goTo(prevIndex);
+    return {
+      index: result,
+      isWrapping: isWrapping,
+      direction: 'down'
+    };
   }
 
   /**

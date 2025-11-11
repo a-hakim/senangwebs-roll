@@ -147,8 +147,11 @@ class Roll {
   /**
    * Slide to item at index
    * @param {number} targetIndex - Target item index
+   * @param {Object} options - Animation options
+   * @param {boolean} options.isWrapping - Whether this is a wrap-around navigation
+   * @param {string} options.direction - Direction of animation ('up' or 'down')
    */
-  slideTo(targetIndex) {
+  slideTo(targetIndex, options = {}) {
     if (targetIndex < 0 || targetIndex >= this.itemElements.length) {
       console.warn('Invalid slide index:', targetIndex);
       return;
@@ -160,12 +163,18 @@ class Roll {
     }
 
     this.isAnimating = true;
+    const previousIndex = this.currentIndex;
     this.currentIndex = targetIndex;
 
-    const offset = -targetIndex * 100;
-    this.container.style.transform = `translateY(${offset}%)`;
-    
-    console.log('🎬 Sliding to item', targetIndex, '- Transform: translateY(' + offset + '%)');
+    // Handle wrap-around animation for seamless looping
+    if (options.isWrapping && this.itemElements.length > 1) {
+      this.handleWrapAnimation(previousIndex, targetIndex, options.direction);
+    } else {
+      // Normal slide animation
+      const offset = -targetIndex * 100;
+      this.container.style.transform = `translateY(${offset}%)`;
+      console.log('🎬 Sliding to item', targetIndex, '- Transform: translateY(' + offset + '%)');
+    }
 
     // Emit slide event
     this.eventManager.emit('slideStarted', { index: targetIndex });
@@ -179,6 +188,92 @@ class Roll {
       console.log('✅ Slide animation completed for item', targetIndex);
       this.eventManager.emit('slideCompleted', { index: targetIndex });
     }, this.config.transitionDuration);
+  }
+
+  /**
+   * Handle wrap-around animation for seamless infinite scrolling
+   * @private
+   * @param {number} fromIndex - Starting index
+   * @param {number} toIndex - Target index
+   * @param {string} direction - Animation direction ('up' or 'down')
+   */
+  handleWrapAnimation(fromIndex, toIndex, direction) {
+    const totalItems = this.itemElements.length;
+    
+    // Wrapping from last to first (user swiped up on last item)
+    // Should animate in the "up" direction (natural continuation)
+    if (fromIndex === totalItems - 1 && toIndex === 0 && direction === 'up') {
+      console.log('🔄 Wrap animation: last → first (animating UP)');
+      
+      // Temporarily disable transition
+      this.container.style.transition = 'none';
+      
+      // Position to show the last item (current position)
+      const currentOffset = -fromIndex * 100;
+      this.container.style.transform = `translateY(${currentOffset}%)`;
+      
+      // Force reflow to apply the no-transition state
+      this.container.offsetHeight;
+      
+      // Re-enable transition
+      this.container.style.transition = `transform ${this.config.transitionDuration}ms ease-in-out`;
+      
+      // Animate to one position "beyond" the last item (which visually represents going to first)
+      // This creates the illusion of continuous upward movement
+      const animateOffset = -(totalItems) * 100;
+      this.container.style.transform = `translateY(${animateOffset}%)`;
+      
+      console.log('  From:', currentOffset + '% → To:', animateOffset + '%');
+      
+      // After animation completes, snap to actual first item position without animation
+      setTimeout(() => {
+        this.container.style.transition = 'none';
+        this.container.style.transform = `translateY(0%)`;
+        // Force reflow
+        this.container.offsetHeight;
+        this.container.style.transition = `transform ${this.config.transitionDuration}ms ease-in-out`;
+      }, this.config.transitionDuration);
+    }
+    // Wrapping from first to last (user swiped down on first item)
+    // Should animate in the "down" direction (natural continuation)
+    else if (fromIndex === 0 && toIndex === totalItems - 1 && direction === 'down') {
+      console.log('🔄 Wrap animation: first → last (animating DOWN)');
+      
+      // Temporarily disable transition
+      this.container.style.transition = 'none';
+      
+      // Position to show the first item at index 0
+      this.container.style.transform = `translateY(0%)`;
+      
+      // Force reflow
+      this.container.offsetHeight;
+      
+      // Re-enable transition
+      this.container.style.transition = `transform ${this.config.transitionDuration}ms ease-in-out`;
+      
+      // Animate to one position "before" the first item (downward movement)
+      // This gives the illusion of continuous downward scrolling
+      const animateOffset = 100;
+      this.container.style.transform = `translateY(${animateOffset}%)`;
+      
+      console.log('  From: 0% → To:', animateOffset + '%');
+      
+      // After animation completes, snap to actual last item position without animation
+      setTimeout(() => {
+        this.container.style.transition = 'none';
+        const finalOffset = -(totalItems - 1) * 100;
+        this.container.style.transform = `translateY(${finalOffset}%)`;
+        // Force reflow
+        this.container.offsetHeight;
+        this.container.style.transition = `transform ${this.config.transitionDuration}ms ease-in-out`;
+      }, this.config.transitionDuration);
+    }
+    // Fallback to normal animation if conditions don't match
+    else {
+      const offset = -toIndex * 100;
+      this.container.style.transform = `translateY(${offset}%)`;
+      console.log('🎬 Sliding to item', toIndex, '- Transform: translateY(' + offset + '%)');
+    }
   }
 
   /**

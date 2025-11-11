@@ -295,9 +295,12 @@ class SWR {
   next() {
     if (this.isDestroyed) return;
 
-    const newIndex = this.navigation.next();
-    console.log('✨ Navigating to next item - Index:', newIndex);
-    this.roll.slideTo(newIndex);
+    const navResult = this.navigation.next();
+    console.log('✨ Navigating to next item - Index:', navResult.index, 'Wrapping:', navResult.isWrapping);
+    this.roll.slideTo(navResult.index, {
+      isWrapping: navResult.isWrapping,
+      direction: navResult.direction
+    });
   }
 
   /**
@@ -306,9 +309,12 @@ class SWR {
   prev() {
     if (this.isDestroyed) return;
 
-    const newIndex = this.navigation.prev();
-    console.log('✨ Navigating to previous item - Index:', newIndex);
-    this.roll.slideTo(newIndex);
+    const navResult = this.navigation.prev();
+    console.log('✨ Navigating to previous item - Index:', navResult.index, 'Wrapping:', navResult.isWrapping);
+    this.roll.slideTo(navResult.index, {
+      isWrapping: navResult.isWrapping,
+      direction: navResult.direction
+    });
   }
 
   /**
