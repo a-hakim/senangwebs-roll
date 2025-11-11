@@ -43,6 +43,13 @@ class ConfigParser {
       }
     });
 
+    // If autoplay is enabled but loop is not explicitly set, enable loop automatically
+    // This ensures autoplay works continuously without stopping at the last item
+    if (config.autoplay && userConfig.loop === undefined) {
+      config.loop = true;
+      console.log('🔄 Auto-enabling loop for autoplay');
+    }
+
     this.validate(config);
     return config;
   }

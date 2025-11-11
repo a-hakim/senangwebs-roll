@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Autoplay Test - SenangWebs Roll</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../dist/swr.min.css" />
+    <style>
+        body {
+            padding: 20px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <h1 class="text-3xl font-bold mb-4">🎬 Autoplay Test</h1>
+    
+    <div class="bg-white p-4 rounded-lg shadow-lg mb-4">
+        <h2 class="text-xl font-bold mb-2">Autoplay with Auto-Loop</h2>
+        <p class="text-gray-600 mb-4">Loop should be automatically enabled. Watch it cycle through all 4 slides continuously.</p>
+        
+        <div id="autoplayTest"></div>
+        
+        <div class="mt-4 space-x-2">
+            <button id="playBtn" class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">▶️ Play</button>
+            <button id="pauseBtn" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">⏸️ Pause</button>
+        </div>
+        
+        <div id="status" class="mt-4 p-3 bg-blue-50 rounded text-blue-800 font-medium">
+            ⏳ Initializing...
+        </div>
+    </div>
+
+    <script src="../dist/swr.min.js"></script>
+    <script>
+        console.log('🎬 Starting Autoplay Test');
+        
+        const roll = new SWR("#autoplayTest", {
+            aspectRatio: "9:16",
+            autoplay: true,
+            autoplayInterval: 2000, // 2 seconds per slide
+            transitionDuration: 500,
+            items: [
+                {
+                    type: "html",
+                    content: '<div class="h-full bg-gradient-to-br from-blue-500 to-purple-600 flex flex-col items-center justify-center text-white p-8"><div class="text-6xl mb-4">1️⃣</div><h1 class="text-3xl font-bold">Slide 1</h1><p class="text-lg mt-2">Autoplay Active</p></div>',
+                },
+                {
+                    type: "html",
+                    content: '<div class="h-full bg-gradient-to-br from-green-500 to-teal-600 flex flex-col items-center justify-center text-white p-8"><div class="text-6xl mb-4">2️⃣</div><h1 class="text-3xl font-bold">Slide 2</h1><p class="text-lg mt-2">Every 2 Seconds</p></div>',
+                },
+                {
+                    type: "html",
+                    content: '<div class="h-full bg-gradient-to-br from-orange-500 to-red-600 flex flex-col items-center justify-center text-white p-8"><div class="text-6xl mb-4">3️⃣</div><h1 class="text-3xl font-bold">Slide 3</h1><p class="text-lg mt-2">Seamless Loop</p></div>',
+                },
+                {
+                    type: "html",
+                    content: '<div class="h-full bg-gradient-to-br from-pink-500 to-rose-600 flex flex-col items-center justify-center text-white p-8"><div class="text-6xl mb-4">4️⃣</div><h1 class="text-3xl font-bold">Slide 4</h1><p class="text-lg mt-2">Watch it wrap!</p></div>',
+                },
+            ],
+        });
+
+        // Button controls
+        document.getElementById("playBtn").addEventListener("click", () => {
+            console.log('▶️ Play button clicked');
+            roll.play();
+        });
+
+        document.getElementById("pauseBtn").addEventListener("click", () => {
+            console.log('⏸️ Pause button clicked');
+            roll.pause();
+        });
+
+        // Status updates
+        const statusEl = document.getElementById("status");
+        
+        roll.on("initialized", (data) => {
+            console.log('✅ Roll initialized:', data);
+            statusEl.textContent = "✅ Initialized - Autoplay should start";
+        });
+
+        roll.on("autoplayStart", () => {
+            console.log('▶️ Autoplay started');
+            statusEl.textContent = "▶️ Autoplay is RUNNING";
+            statusEl.className = "mt-4 p-3 bg-green-50 rounded text-green-800 font-medium";
+        });
+
+        roll.on("autoplayPause", () => {
+            console.log('⏸️ Autoplay paused');
+            statusEl.textContent = "⏸️ Autoplay is PAUSED";
+            statusEl.className = "mt-4 p-3 bg-red-50 rounded text-red-800 font-medium";
+        });
+
+        roll.on("slideCompleted", (data) => {
+            console.log('✅ Slide completed:', data.index);
+            const currentIndex = roll.getCurrentIndex();
+            const totalItems = roll.getTotalItems();
+            statusEl.textContent = `▶️ Autoplay Running - Slide ${currentIndex + 1} of ${totalItems}`;
+        });
+
+        roll.on("navigationChanged", (data) => {
+            console.log('🔄 Navigation changed:', data);
+        });
+    </script>
+</body>
+</html>
