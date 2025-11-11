@@ -7,6 +7,9 @@ A lightweight, responsive roll library for creating mobile-like media rolls simi
 - **Multiple Media Types**: Support for images, videos, and custom HTML content
 - **Two Initialization Methods**: HTML data attributes or JavaScript API
 - **Touch & Keyboard Navigation**: Swipe gestures and arrow key support
+- **Seamless Infinite Scrolling**: Natural wrap-around animation when looping (like Instagram Reels)
+- **Smart Autoplay**: Automatically enables looping for continuous playback
+- **Mouse Drag & Wheel Support**: Full desktop navigation with mouse drag and wheel scrolling
 - **Customizable**: Flexible configuration for aspect ratios, autoplay, looping, and more
 - **Lightweight & Responsive**: Optimized for both mobile and desktop devices
 - **No Dependencies**: Pure vanilla JavaScript, no external libraries required
@@ -15,12 +18,58 @@ A lightweight, responsive roll library for creating mobile-like media rolls simi
 
 ## Quick Start
 
-### HTML Data Attributes Method
+### Installation
+
+Include the compiled CSS and JS files in your HTML:
 
 ```html
-<div data-swr data-swr-aspect-ratio="9:16" data-swr-loop="true">
+<link rel="stylesheet" href="dist/swr.min.css">
+<script src="dist/swr.min.js"></script>
+```
+
+### Method 1: JavaScript API (Recommended)
+
+```html
+<div id="myRoll"></div>
+
+<script>
+const roll = new SWR('#myRoll', {
+    aspectRatio: '9:16',
+    loop: true,
+    autoplay: true,
+    autoplayInterval: 5000,
+    items: [
+        {
+            type: 'video',
+            src: 'video.mp4',
+            muted: true,
+            playsinline: true
+        },
+        {
+            type: 'image',
+            src: 'image.jpg',
+            alt: 'Demo Image'
+        },
+        {
+            type: 'html',
+            content: '<div style="height: 100%; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;"><h1>Custom Slide</h1></div>'
+        }
+    ]
+});
+</script>
+```
+
+### Method 2: HTML Data Attributes
+
+```html
+<!-- Automatically initializes on page load - no JavaScript required! -->
+<div data-swr 
+     data-swr-aspect-ratio="9:16" 
+     data-swr-loop="true"
+     data-swr-autoplay="true"
+     data-swr-autoplay-interval="5000">
     <div data-swr-item>
-        <video autoplay muted playsinline>
+        <video autoplay muted playsinline loop>
             <source src="video.mp4" type="video/mp4">
         </video>
     </div>
@@ -28,57 +77,11 @@ A lightweight, responsive roll library for creating mobile-like media rolls simi
         <img src="image.jpg" alt="Image">
     </div>
     <div data-swr-item>
-        <div style="display: flex; justify-content: center; align-items: center; height: 100%;">
+        <div style="height: 100%; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
             <h1>Custom Content</h1>
         </div>
     </div>
 </div>
-
-<link rel="stylesheet" href="src/css/swr.css">
-<script src="src/js/parsers/ConfigParser.js"></script>
-<script src="src/js/parsers/DataAttributeParser.js"></script>
-<script src="src/js/core/EventManager.js"></script>
-<script src="src/js/core/MediaManager.js"></script>
-<script src="src/js/core/Navigation.js"></script>
-<script src="src/js/core/Roll.js"></script>
-<script src="src/js/handlers/TouchHandler.js"></script>
-<script src="src/js/handlers/KeyboardHandler.js"></script>
-<script src="src/js/handlers/AutoplayHandler.js"></script>
-<script src="src/js/renderers/HTMLRenderer.js"></script>
-<script src="src/js/renderers/VideoRenderer.js"></script>
-<script src="src/js/renderers/ImageRenderer.js"></script>
-<script src="src/js/index.js"></script>
-```
-
-### JavaScript API Method
-
-```javascript
-const roll = new SWR('#myRoll', {
-    aspectRatio: '9:16',
-    loop: true,
-    autoplay: true,
-    autoplayInterval: 5000,
-    enableKeyboard: true,
-    enableTouch: true,
-    items: [
-        {
-            type: 'video',
-            src: 'video.mp4',
-            autoplay: true,
-            muted: true,
-            playsinline: true
-        },
-        {
-            type: 'image',
-            src: 'image.jpg',
-            alt: 'Demo'
-        },
-        {
-            type: 'html',
-            content: '<div style="height: 100%; display: flex; align-items: center; justify-content: center;"><h1>Slide 3</h1></div>'
-        }
-    ]
-});
 ```
 
 ## Configuration Options
@@ -86,11 +89,13 @@ const roll = new SWR('#myRoll', {
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
 | `aspectRatio` | string | `'9:16'` | Aspect ratio of the roll (e.g., '9:16', '16:9', '1:1') |
-| `loop` | boolean | `false` | Enable infinite looping through items |
-| `autoplay` | boolean | `false` | Start autoplay automatically on load |
+| `loop` | boolean | `false` | Enable infinite looping through items (auto-enabled when `autoplay` is true) |
+| `autoplay` | boolean | `false` | Start autoplay automatically on load (automatically enables `loop` if not explicitly set) |
 | `autoplayInterval` | number | `5000` | Time between autoplay slides (milliseconds) |
 | `enableKeyboard` | boolean | `true` | Enable arrow key navigation |
 | `enableTouch` | boolean | `true` | Enable swipe gesture navigation |
+| `enableWheel` | boolean | `true` | Enable mouse wheel navigation |
+| `enableMouseDrag` | boolean | `true` | Enable mouse drag navigation |
 | `enableAutoplayPauseOnInteraction` | boolean | `true` | Pause autoplay on user interaction |
 | `autoplayResumeDelay` | number | `3000` | Delay before resuming autoplay (milliseconds) |
 | `transitionDuration` | number | `350` | Animation duration for slides (milliseconds) |
@@ -153,13 +158,19 @@ Use HTML data attributes for configuration:
 - **`slideCompleted`** - Emitted when slide animation completes
 - **`autoplayStart`** - Emitted when autoplay starts
 - **`autoplayPause`** - Emitted when autoplay pauses
+- **`autoplayTick`** - Emitted on each autoplay interval tick
 - **`autoplayPausedTemporarily`** - Emitted when autoplay pauses temporarily
 - **`swipeDetected`** - Emitted when swipe is detected
+- **`tapDetected`** - Emitted when tap is detected (toggles autoplay)
 - **`keyboardEvent`** - Emitted on keyboard interaction
+- **`wheelDetected`** - Emitted when mouse wheel is used
+- **`dragDetected`** - Emitted when mouse drag is detected
 - **`beforeRender`** - Emitted before item renders
 - **`afterRender`** - Emitted after item renders
 - **`itemAdded`** - Emitted when item is added
 - **`itemRemoved`** - Emitted when item is removed
+- **`itemUpdated`** - Emitted when item is updated
+- **`itemsCleared`** - Emitted when all items are cleared
 - **`destroy`** - Emitted when instance is destroyed
 
 ### Item Object Structure
@@ -195,19 +206,53 @@ Use HTML data attributes for configuration:
 }
 ```
 
+## Seamless Infinite Scrolling
+
+SWR features intelligent wrap-around animation that creates a natural, continuous scrolling experience similar to Instagram Reels:
+
+- **Natural Direction**: When swiping up on the last item, it smoothly continues upward to the first item (not jarring downward jump)
+- **Intuitive Flow**: When swiping down on the first item, it smoothly continues downward to the last item
+- **Automatic Loop**: When `autoplay: true` is set, `loop` is automatically enabled for continuous playback
+- **Seamless Transitions**: Uses optimized CSS transforms for smooth, GPU-accelerated animations
+
+### How It Works
+
+```javascript
+// Autoplay automatically enables loop for seamless continuous playback
+const roll = new SWR('#roll', {
+    autoplay: true,  // loop is automatically set to true
+    autoplayInterval: 3000
+});
+
+// Or manually enable loop for seamless infinite scrolling
+const roll2 = new SWR('#roll2', {
+    loop: true  // Enables seamless wrap-around navigation
+});
+```
+
 ## Examples
 
 ### Example 1: Basic Setup with Autoplay
 
 ```javascript
 const roll = new SWR('#roll', {
-    autoplay: true,
-    loop: true,
+    autoplay: true,  // Loop is auto-enabled
     autoplayInterval: 3000
 });
 ```
 
-### Example 2: Event Handling
+### Example 2: Manual Loop Control
+
+```javascript
+// Disable automatic loop enabling (if you want autoplay to stop at the end)
+const roll = new SWR('#roll', {
+    autoplay: true,
+    loop: false,  // Explicitly set to false to override auto-enabling
+    autoplayInterval: 3000
+});
+```
+
+### Example 3: Event Handling
 
 ```javascript
 const roll = new SWR('#roll');
@@ -226,9 +271,18 @@ roll.on('slideCompleted', (data) => {
 roll.on('autoplayStart', () => {
     console.log('Autoplay started');
 });
+
+// Listen to user interactions
+roll.on('swipeDetected', (data) => {
+    console.log('Swipe direction:', data.direction);
+});
+
+roll.on('tapDetected', () => {
+    console.log('Tap detected - autoplay toggled');
+});
 ```
 
-### Example 3: Dynamic Content Management
+### Example 4: Dynamic Content Management
 
 ```javascript
 const roll = new SWR('#roll');
@@ -250,12 +304,47 @@ roll.addItem({
 // Remove items
 roll.removeItem(0);
 
+// Navigate programmatically
+roll.next();  // Go to next item
+roll.prev();  // Go to previous item
+roll.goTo(2); // Jump to specific item
+
 // Check current state
 console.log(`Total items: ${roll.getTotalItems()}`);
 console.log(`Current index: ${roll.getCurrentIndex()}`);
+console.log(`Is playing: ${roll.isPlaying()}`);
 ```
 
-### Example 4: Custom Styling
+### Example 5: Full-Featured Setup
+
+```javascript
+const roll = new SWR('#roll', {
+    aspectRatio: '9:16',
+    autoplay: true,
+    autoplayInterval: 4000,
+    transitionDuration: 500,
+    enableKeyboard: true,
+    enableTouch: true,
+    enableWheel: true,
+    enableMouseDrag: true,
+    enableAutoplayPauseOnInteraction: true,
+    autoplayResumeDelay: 2000,
+    swipeThreshold: 50,
+    items: [
+        { type: 'video', src: 'video1.mp4', muted: true },
+        { type: 'image', src: 'image1.jpg', alt: 'Image' },
+        { type: 'html', content: '<div class="custom-slide">Content</div>' }
+    ]
+});
+
+// Listen to all events
+roll.on('initialized', () => console.log('Ready!'));
+roll.on('slideCompleted', (data) => console.log('Slide:', data.index));
+roll.on('autoplayStart', () => console.log('Playing'));
+roll.on('autoplayPause', () => console.log('Paused'));
+```
+
+### Example 6: Custom Styling
 
 ```css
 /* Override default aspect ratio */
@@ -274,11 +363,19 @@ console.log(`Current index: ${roll.getCurrentIndex()}`);
 }
 ```
 
-## Keyboard Controls
+## Navigation Controls
 
-- **Arrow Right** - Next item
-- **Arrow Left** - Previous item
+### Keyboard
+- **Arrow Down** / **Arrow Right** - Next item
+- **Arrow Up** / **Arrow Left** - Previous item
 - **Space** - Toggle autoplay
+
+### Touch/Mouse
+- **Swipe Up** / **Drag Up** - Next item
+- **Swipe Down** / **Drag Down** - Previous item
+- **Tap/Click** - Toggle autoplay
+- **Mouse Wheel Up** - Previous item
+- **Mouse Wheel Down** - Next item
 
 ## Responsive Behavior
 
@@ -288,6 +385,24 @@ The roll automatically adapts to different screen sizes:
 - **Desktop** (≥ 768px) - Aspect ratio 16:9, optimized for landscape viewing
 
 Customize aspect ratios via configuration.
+
+## Important Behaviors
+
+### Autoplay and Loop
+- When `autoplay: true` is set, `loop` is automatically enabled (unless explicitly set to `false`)
+- This ensures continuous playback without stopping at the last item
+- To disable auto-looping, explicitly set `loop: false` in your configuration
+
+### Seamless Wrap Animation
+- When `loop: true`, navigating from the last item to the first (or vice versa) uses a seamless animation
+- The animation direction matches the user's gesture for an intuitive experience
+- Swipe up on last item → continues upward to first item
+- Swipe down on first item → continues downward to last item
+
+### Interaction Pausing
+- When `enableAutoplayPauseOnInteraction: true`, user interactions (swipe, tap, keyboard, wheel, drag) temporarily pause autoplay
+- Autoplay resumes after `autoplayResumeDelay` milliseconds
+- Tap/click on the roll toggles autoplay on/off
 
 ## Accessibility
 
