@@ -15,27 +15,14 @@
   "keywords": [
     "roll",
     "slider",
-    "reel",
     "reels",
-    "instagram",
-    "youtube",
-    "responsive",
     "touch",
     "swipe",
     "lightweight",
-    "vanilla-js",
     "javascript"
   ],
-  "author": "SenangWebs Team",
+  "author": "a-hakim",
   "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/senangwebs/senangwebs-roll.git"
-  },
-  "bugs": {
-    "url": "https://github.com/senangwebs/senangwebs-roll/issues"
-  },
-  "homepage": "https://github.com/senangwebs/senangwebs-roll#readme",
   "devDependencies": {
     "@babel/core": "^7.22.0",
     "@babel/preset-env": "^7.22.0",

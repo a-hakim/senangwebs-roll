@@ -1,8 +1,8 @@
-# 🎬 SenangWebs Roll (SWR)
+# SenangWebs Roll (SWR)
 
 A lightweight, responsive roll library for creating mobile-like media rolls similar to Instagram Reels or YouTube Shorts.
 
-## ✨ Features
+## Features
 
 - **Multiple Media Types**: Support for images, videos, and custom HTML content
 - **Two Initialization Methods**: HTML data attributes or JavaScript API
@@ -13,34 +13,7 @@ A lightweight, responsive roll library for creating mobile-like media rolls simi
 - **Event System**: Custom events for complete control over roll behavior
 - **Accessible**: Keyboard navigation and accessibility-friendly markup
 
-## 📦 Project Structure
-
-```
-src/
-├── js/
-│   ├── index.js                    # Main SWR class
-│   ├── core/
-│   │   ├── Roll.js                # Core roll logic & animations
-│   │   ├── Navigation.js          # Navigation methods (next, prev, goTo)
-│   │   ├── MediaManager.js        # Media item management
-│   │   └── EventManager.js        # Custom event system
-│   ├── handlers/
-│   │   ├── TouchHandler.js        # Swipe gesture detection
-│   │   ├── KeyboardHandler.js     # Arrow key navigation
-│   │   └── AutoplayHandler.js     # Autoplay functionality
-│   ├── renderers/
-│   │   ├── HTMLRenderer.js        # HTML content rendering
-│   │   ├── VideoRenderer.js       # Video rendering
-│   │   └── ImageRenderer.js       # Image rendering
-│   └── parsers/
-│       ├── ConfigParser.js        # Configuration validation & merging
-│       └── DataAttributeParser.js # HTML data attribute parsing
-├── css/
-│   └── swr.css                    # Core styles & animations
-└── demo.html                      # Working demo with examples
-```
-
-## 🚀 Quick Start
+## Quick Start
 
 ### HTML Data Attributes Method
 
@@ -108,7 +81,7 @@ const roll = new SWR('#myRoll', {
 });
 ```
 
-## ⚙️ Configuration Options
+## Configuration Options
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
@@ -139,7 +112,7 @@ Use HTML data attributes for configuration:
   data-swr-swipe-threshold="40">
 ```
 
-## 📚 API Reference
+## API Reference
 
 ### Methods
 
@@ -222,7 +195,7 @@ Use HTML data attributes for configuration:
 }
 ```
 
-## 📖 Usage Examples
+## Examples
 
 ### Example 1: Basic Setup with Autoplay
 
@@ -301,13 +274,13 @@ console.log(`Current index: ${roll.getCurrentIndex()}`);
 }
 ```
 
-## 🎯 Keyboard Controls
+## Keyboard Controls
 
 - **Arrow Right** - Next item
 - **Arrow Left** - Previous item
 - **Space** - Toggle autoplay
 
-## 📱 Responsive Behavior
+## Responsive Behavior
 
 The roll automatically adapts to different screen sizes:
 
@@ -316,7 +289,7 @@ The roll automatically adapts to different screen sizes:
 
 Customize aspect ratios via configuration.
 
-## ♿ Accessibility
+## Accessibility
 
 - Keyboard navigation support (arrow keys)
 - Semantic HTML markup
@@ -324,25 +297,17 @@ Customize aspect ratios via configuration.
 - High contrast support
 - Reduced motion support (via `prefers-reduced-motion`)
 
-## 🔧 Browser Support
+## Browser Support
 
 - Chrome/Edge (latest)
 - Firefox (latest)
 - Safari (latest)
 - Mobile browsers (iOS Safari, Chrome Mobile)
 
-## 📄 License
+## License
 
 MIT License - Feel free to use in your projects!
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome! Please feel free to submit issues and pull requests.
-
-## 📧 Support
-
-For issues, questions, or suggestions, please open an issue on GitHub or contact the development team.
-
----
-
-**Built with ❤️ by SenangWebs Team**
