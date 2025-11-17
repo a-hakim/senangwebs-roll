@@ -23,15 +23,18 @@ A lightweight, responsive roll library for creating mobile-like media rolls simi
 Include the compiled CSS and JS files in your HTML:
 
 ```html
-<link rel="stylesheet" href="dist/swr.min.css">
-<script src="dist/swr.min.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/senangwebs-roll@latest/dist/swr.min.css">
+<script src="https://unpkg.com/senangwebs-roll@latest/dist/swr.min.js"></script>
 ```
 
 ### Method 1: JavaScript API (Recommended)
 
 ```html
+<link rel="stylesheet" href="https://unpkg.com/senangwebs-roll@latest/dist/swr.min.css">
+
 <div id="myRoll"></div>
 
+<script src="https://unpkg.com/senangwebs-roll@latest/dist/swr.min.js"></script>
 <script>
 const roll = new SWR('#myRoll', {
     aspectRatio: '9:16',
@@ -62,6 +65,7 @@ const roll = new SWR('#myRoll', {
 ### Method 2: HTML Data Attributes
 
 ```html
+<link rel="stylesheet" href="https://unpkg.com/senangwebs-roll@latest/dist/swr.min.css">
 <!-- Automatically initializes on page load - no JavaScript required! -->
 <div data-swr 
      data-swr-aspect-ratio="9:16" 
@@ -82,6 +86,7 @@ const roll = new SWR('#myRoll', {
         </div>
     </div>
 </div>
+<script src="https://unpkg.com/senangwebs-roll@latest/dist/swr.min.js"></script>
 ```
 
 ## Configuration Options
@@ -421,7 +426,7 @@ Customize aspect ratios via configuration.
 
 ## License
 
-MIT License - Feel free to use in your projects!
+MIT License
 
 ## Contributing
 
