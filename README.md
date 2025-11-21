@@ -2,6 +2,8 @@
 
 A lightweight, responsive roll library for creating mobile-like media rolls similar to Instagram Reels or YouTube Shorts.
 
+![SenangWebs Roll Preview](https://raw.githubusercontent.com/a-hakim/senangwebs-roll/master/swr_preview.png)
+
 ## Features
 
 - **Multiple Media Types**: Support for images, videos, and custom HTML content
