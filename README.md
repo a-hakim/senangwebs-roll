@@ -2,6 +2,8 @@
 
 A lightweight, responsive roll library for creating mobile-like media rolls similar to Instagram Reels or YouTube Shorts.
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE.md)
+
 ![SenangWebs Roll Preview](https://raw.githubusercontent.com/a-hakim/senangwebs-roll/master/swr_preview.png)
 
 ## Features
