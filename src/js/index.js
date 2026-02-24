@@ -76,12 +76,16 @@ class SWR {
     // Merge data attributes into config
     this.config = ConfigParser.parse({ ...this.config, ...dataConfig });
 
-    // Setup roll DOM
+    // Setup roll DOM (preserves existing data-swr-item elements)
     this.roll.initialize();
+
+    // Track whether items came from DOM (already rendered) or config (need rendering)
+    let itemsFromDOM = false;
 
     // Add items (from data attributes or config)
     if (dataItems.length > 0) {
       dataItems.forEach((item) => this.mediaManager.addItem(item));
+      itemsFromDOM = true;
     } else if (this.config.items) {
       this.config.items.forEach((item) => this.mediaManager.addItem(item));
     }
@@ -90,8 +94,11 @@ class SWR {
     const itemCount = this.mediaManager.getItemCount();
     this.navigation.initialize(itemCount);
 
-    // Render initial items
-    this.renderItems();
+    // Only render items if they came from JS config, not from DOM attributes.
+    // When items are from DOM, setupDOM() already preserved the original content.
+    if (!itemsFromDOM) {
+      this.renderItems();
+    }
 
     // Setup handlers
     this.setupHandlers();

@@ -1,6 +1,6 @@
 {
   "name": "senangwebs-roll",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A lightweight, responsive roll library for creating mobile-like media rolls (Instagram Reels/YouTube Shorts style)",
   "main": "dist/swr.js",
   "types": "dist/swr.d.ts",

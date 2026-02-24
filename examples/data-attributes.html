@@ -187,8 +187,13 @@
                                 </div>
                             </div>
                             <!-- Image -->
-                            <div data-swr-item>
-                                <img src="https://picsum.photos/seed/data1/400/700" alt="Example image" class="w-full h-full object-cover">
+                            <div data-swr-item class="bg-red-500 flex flex-col">
+                                <div class="p-4 text-white font-bold">
+                                    Image Slide
+                                </div>
+                                <div class="flex-grow">
+                                    <img src="https://picsum.photos/seed/data1/400/400" alt="Example image" class="w-full h-full object-cover">
+                                </div>
                             </div>
                             <!-- HTML Content -->
                             <div data-swr-item>
@@ -220,7 +225,12 @@
   
   &lt;!-- Image --&gt;
   &lt;div data-swr-item&gt;
-    &lt;img src="image.jpg" alt="..."&gt;
+    &lt;div class="p-4 text-white font-bold"&gt;
+        Image Slide
+    &lt;/div&gt;
+    &lt;div class="flex-grow"&gt;
+        &lt;img src="image.jpg" alt="..."&gt;
+    &lt;/div&gt;
   &lt;/div&gt;
   
   &lt;!-- Video --&gt;
