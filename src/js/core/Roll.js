@@ -55,13 +55,15 @@ class Roll {
    * Setup initial styles
    */
   setupStyles() {
-    // Set viewport aspect ratio using padding-bottom trick for better browser support
-    const ratio = this.parseAspectRatio(this.config.aspectRatio);
-    const paddingPercent = (1 / ratio) * 100;
-    
+    // Let CSS handle the responsive aspect ratio (16:9 desktop, 9:16 mobile)
+    // Only apply inline if it strictly differs from the CSS default or is custom mapped.
+    // For now, we rely on the CSS, but we can set a CSS variable if needed in the future.
     this.viewport.style.position = 'relative';
     this.viewport.style.width = '100%';
-    this.viewport.style.paddingBottom = `${paddingPercent}%`;
+    // Always apply the configured aspect ratio as an inline style so it takes
+    // priority over the CSS media-query defaults (which switch between 9:16 and 16:9).
+    const [width, height] = this.config.aspectRatio.split(':').map(Number);
+    this.viewport.style.aspectRatio = `${width} / ${height}`;
     this.viewport.style.overflow = 'hidden';
 
     // Setup container for vertical scrolling (Instagram Reels style)
@@ -162,6 +164,12 @@ class Roll {
       return;
     }
 
+    // Bug Fix 1: Skip animation if sliding to the same edge item and we are not wrapping
+    if (targetIndex === this.currentIndex && !options.isWrapping) {
+      console.log('🛑 Already at boundary edge, ignoring slide request to same index');
+      return;
+    }
+
     this.isAnimating = true;
     const previousIndex = this.currentIndex;
     this.currentIndex = targetIndex;
@@ -201,70 +209,70 @@ class Roll {
     const totalItems = this.itemElements.length;
     
     // Wrapping from last to first (user swiped up on last item)
-    // Should animate in the "up" direction (natural continuation)
     if (fromIndex === totalItems - 1 && toIndex === 0 && direction === 'up') {
       console.log('🔄 Wrap animation: last → first (animating UP)');
       
-      // Temporarily disable transition
-      this.container.style.transition = 'none';
+      const firstItem = this.itemElements[0];
       
-      // Position to show the last item (current position)
-      const currentOffset = -fromIndex * 100;
-      this.container.style.transform = `translateY(${currentOffset}%)`;
+      // Temporarily move the first item physically *below* the last item
+      // so the container animation over it looks perfectly continuous instead of showing blank space.
+      const shiftAmount = totalItems * 100;
+      firstItem.style.transform = `translateY(${shiftAmount}%)`;
       
-      // Force reflow to apply the no-transition state
-      this.container.offsetHeight;
-      
-      // Re-enable transition
-      this.container.style.transition = `transform ${this.config.transitionDuration}ms ease-in-out`;
-      
-      // Animate to one position "beyond" the last item (which visually represents going to first)
-      // This creates the illusion of continuous upward movement
-      const animateOffset = -(totalItems) * 100;
+      // Animate container to this artificial position (one past the last item)
+      const animateOffset = -shiftAmount;
       this.container.style.transform = `translateY(${animateOffset}%)`;
       
-      console.log('  From:', currentOffset + '% → To:', animateOffset + '%');
-      
-      // After animation completes, snap to actual first item position without animation
+      // After animation completes, snap everything back to true 0 state invisibly
       setTimeout(() => {
+        // Disable transition for instantaneous snap
         this.container.style.transition = 'none';
+        
+        // Remove individual element transform
+        firstItem.style.transform = '';
+        
+        // Snap container to true 0 position
         this.container.style.transform = `translateY(0%)`;
+        
         // Force reflow
         this.container.offsetHeight;
+        
+        // Re-enable transition for future slides
         this.container.style.transition = `transform ${this.config.transitionDuration}ms ease-in-out`;
       }, this.config.transitionDuration);
     }
     // Wrapping from first to last (user swiped down on first item)
-    // Should animate in the "down" direction (natural continuation)
     else if (fromIndex === 0 && toIndex === totalItems - 1 && direction === 'down') {
       console.log('🔄 Wrap animation: first → last (animating DOWN)');
       
-      // Temporarily disable transition
-      this.container.style.transition = 'none';
+      const lastItem = this.itemElements[totalItems - 1];
       
-      // Position to show the first item at index 0
-      this.container.style.transform = `translateY(0%)`;
+      // Temporarily move the last item physically *above* the first item.
+      // The last item naturally sits at (totalItems-1)*100% in the flex column.
+      // We shift it up by totalItems*100% so it lands at -100% (one slot above item 0).
+      const shiftAmount = -totalItems * 100;
+      lastItem.style.transform = `translateY(${shiftAmount}%)`;
       
-      // Force reflow
-      this.container.offsetHeight;
+      // Animate container down by exactly one viewport height to reveal the repositioned last item.
+      // Container is currently at translateY(0%). Moving to translateY(100%) shifts the viewport
+      // up to show the -100% to 0% range, which is exactly where the last item now sits.
+      this.container.style.transform = `translateY(100%)`;
       
-      // Re-enable transition
-      this.container.style.transition = `transform ${this.config.transitionDuration}ms ease-in-out`;
-      
-      // Animate to one position "before" the first item (downward movement)
-      // This gives the illusion of continuous downward scrolling
-      const animateOffset = 100;
-      this.container.style.transform = `translateY(${animateOffset}%)`;
-      
-      console.log('  From: 0% → To:', animateOffset + '%');
-      
-      // After animation completes, snap to actual last item position without animation
+      // After animation completes, snap everything back to accurate final state invisibly
       setTimeout(() => {
         this.container.style.transition = 'none';
+        
+        // Remove individual element transform
+        lastItem.style.transform = '';
+        
+        // Snap container to true last item position
         const finalOffset = -(totalItems - 1) * 100;
         this.container.style.transform = `translateY(${finalOffset}%)`;
+        
         // Force reflow
         this.container.offsetHeight;
+        
+        // Re-enable transition
         this.container.style.transition = `transform ${this.config.transitionDuration}ms ease-in-out`;
       }, this.config.transitionDuration);
     }

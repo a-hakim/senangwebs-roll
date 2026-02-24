@@ -60,14 +60,23 @@ class AutoplayHandler {
    * @param {number} delay - Delay before resume (ms)
    */
   pauseTemporarily(delay = null) {
-    if (!this.isPlaying) return;
+    if (!this.isPlaying && !this.isTemporarilyPaused()) return;
 
-    this.pause();
+    if (this.isPlaying) {
+      this.pause();
+    }
+
+    // Bug Fix 2: If we are already temporarily paused, clear the old timer so the new one extends it.
+    if (this.resumeTimer) {
+      clearTimeout(this.resumeTimer);
+      this.resumeTimer = null;
+    }
 
     delay = delay || this.config.autoplayResumeDelay;
 
     // Schedule resume
     this.resumeTimer = setTimeout(() => {
+      this.resumeTimer = null;
       this.play();
     }, delay);
 
@@ -97,6 +106,14 @@ class AutoplayHandler {
    */
   isAutoplayPaused() {
     return this.isPaused;
+  }
+
+  /**
+   * Check if autoplay is temporarily paused waiting to resume
+   * @returns {boolean}
+   */
+  isTemporarilyPaused() {
+    return this.resumeTimer !== null;
   }
 
   /**

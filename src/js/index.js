@@ -156,25 +156,25 @@ class SWR {
     // Listen for user interactions to pause autoplay
     if (this.config.enableAutoplayPauseOnInteraction) {
       this.eventManager.on('swipeDetected', () => {
-        if (this.autoplayHandler.isAutoplayActive()) {
+        if (this.autoplayHandler.isAutoplayActive() || this.autoplayHandler.isTemporarilyPaused()) {
           this.autoplayHandler.pauseTemporarily();
         }
       });
 
       this.eventManager.on('keyboardEvent', () => {
-        if (this.autoplayHandler.isAutoplayActive()) {
+        if (this.autoplayHandler.isAutoplayActive() || this.autoplayHandler.isTemporarilyPaused()) {
           this.autoplayHandler.pauseTemporarily();
         }
       });
 
       this.eventManager.on('wheelDetected', () => {
-        if (this.autoplayHandler.isAutoplayActive()) {
+        if (this.autoplayHandler.isAutoplayActive() || this.autoplayHandler.isTemporarilyPaused()) {
           this.autoplayHandler.pauseTemporarily();
         }
       });
 
       this.eventManager.on('dragDetected', () => {
-        if (this.autoplayHandler.isAutoplayActive()) {
+        if (this.autoplayHandler.isAutoplayActive() || this.autoplayHandler.isTemporarilyPaused()) {
           this.autoplayHandler.pauseTemporarily();
         }
       });
