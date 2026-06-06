@@ -11,24 +11,11 @@
 return /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
-/***/ "./src/css/swr.css":
-/*!*************************!*\
-  !*** ./src/css/swr.css ***!
-  \*************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-// extracted by mini-css-extract-plugin
-
-
-/***/ }),
-
-/***/ "./src/js/core/EventManager.js":
+/***/ "./src/js/core/EventManager.js"
 /*!*************************************!*\
   !*** ./src/js/core/EventManager.js ***!
   \*************************************/
-/***/ ((module) => {
+(module) {
 
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function _classCallCheck(a, n) { if (!(a instanceof n)) throw new TypeError("Cannot call a class as a function"); }
@@ -140,13 +127,13 @@ if ( true && module.exports) {
   module.exports = EventManager;
 }
 
-/***/ }),
+/***/ },
 
-/***/ "./src/js/core/MediaManager.js":
+/***/ "./src/js/core/MediaManager.js"
 /*!*************************************!*\
   !*** ./src/js/core/MediaManager.js ***!
   \*************************************/
-/***/ ((module) => {
+(module) {
 
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbols) { var o = Object.getOwnPropertySymbols(e); r && (o = o.filter(function (r) { return Object.getOwnPropertyDescriptor(e, r).enumerable; })), t.push.apply(t, o); } return t; }
@@ -318,13 +305,13 @@ if ( true && module.exports) {
   module.exports = MediaManager;
 }
 
-/***/ }),
+/***/ },
 
-/***/ "./src/js/core/Navigation.js":
+/***/ "./src/js/core/Navigation.js"
 /*!***********************************!*\
   !*** ./src/js/core/Navigation.js ***!
   \***********************************/
-/***/ ((module) => {
+(module) {
 
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function _classCallCheck(a, n) { if (!(a instanceof n)) throw new TypeError("Cannot call a class as a function"); }
@@ -498,13 +485,13 @@ if ( true && module.exports) {
   module.exports = Navigation;
 }
 
-/***/ }),
+/***/ },
 
-/***/ "./src/js/core/Roll.js":
+/***/ "./src/js/core/Roll.js"
 /*!*****************************!*\
   !*** ./src/js/core/Roll.js ***!
   \*****************************/
-/***/ ((module) => {
+(module) {
 
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function _slicedToArray(r, e) { return _arrayWithHoles(r) || _iterableToArrayLimit(r, e) || _unsupportedIterableToArray(r, e) || _nonIterableRest(); }
@@ -587,15 +574,13 @@ var Roll = /*#__PURE__*/function () {
       // For now, we rely on the CSS, but we can set a CSS variable if needed in the future.
       this.viewport.style.position = 'relative';
       this.viewport.style.width = '100%';
-      // Set aspect ratio directly for modern browsers, letting CSS media queries handle default if not specified.
-      // However, if a custom ratio is defined that isn't the default '9:16', we apply it here.
-      if (this.config.aspectRatio && this.config.aspectRatio !== '9:16') {
-        var _this$config$aspectRa = this.config.aspectRatio.split(':').map(Number),
-          _this$config$aspectRa2 = _slicedToArray(_this$config$aspectRa, 2),
-          width = _this$config$aspectRa2[0],
-          height = _this$config$aspectRa2[1];
-        this.viewport.style.aspectRatio = "".concat(width, " / ").concat(height);
-      }
+      // Always apply the configured aspect ratio as an inline style so it takes
+      // priority over the CSS media-query defaults (which switch between 9:16 and 16:9).
+      var _this$config$aspectRa = this.config.aspectRatio.split(':').map(Number),
+        _this$config$aspectRa2 = _slicedToArray(_this$config$aspectRa, 2),
+        width = _this$config$aspectRa2[0],
+        height = _this$config$aspectRa2[1];
+      this.viewport.style.aspectRatio = "".concat(width, " / ").concat(height);
       this.viewport.style.overflow = 'hidden';
 
       // Setup container for vertical scrolling (Instagram Reels style)
@@ -764,42 +749,30 @@ var Roll = /*#__PURE__*/function () {
         console.log('🔄 Wrap animation: last → first (animating UP)');
         var firstItem = this.itemElements[0];
 
-        // Disable transition for instantaneous invisible snap
-        this.container.style.transition = 'none';
+        // Temporarily move the first item physically *below* the last item
+        // so the container animation over it looks perfectly continuous instead of showing blank space.
+        var shiftAmount = totalItems * 100;
+        firstItem.style.transform = "translateY(".concat(shiftAmount, "%)");
 
-        // Temporarily use flex 'order' to physically place the first item at the end of the flex list.
-        // This natively expands the browser's layout bounding box, avoiding offscreen culling (black flashes).
-        firstItem.style.order = '1';
-
-        // Because we moved the first item, the layout shifts. The last item is now physically 1 position earlier.
-        // We must instantly snap the container to keep the last item perfectly visibly undisturbed.
-        var snapOffset = -(fromIndex - 1) * 100;
-        this.container.style.transform = "translateY(".concat(snapOffset, "%)");
-
-        // Force reflow
-        this.container.offsetHeight;
-
-        // Re-enable transition
-        this.container.style.transition = "transform ".concat(this.config.transitionDuration, "ms ease-in-out");
-
-        // Animate container to reveal the first item (which is now at the very end)
-        var animateOffset = -(totalItems - 1) * 100;
+        // Animate container to this artificial position (one past the last item)
+        var animateOffset = -shiftAmount;
         this.container.style.transform = "translateY(".concat(animateOffset, "%)");
 
-        // After animation completes, snap everything back to accurate true native states
+        // After animation completes, snap everything back to true 0 state invisibly
         setTimeout(function () {
+          // Disable transition for instantaneous snap
           _this3.container.style.transition = 'none';
 
-          // Restore natural flex layout order
-          firstItem.style.order = '0';
+          // Remove individual element transform
+          firstItem.style.transform = '';
 
-          // Snap container to true index 0
+          // Snap container to true 0 position
           _this3.container.style.transform = "translateY(0%)";
 
           // Force reflow
           _this3.container.offsetHeight;
 
-          // Re-enable transition for normal slides
+          // Re-enable transition for future slides
           _this3.container.style.transition = "transform ".concat(_this3.config.transitionDuration, "ms ease-in-out");
         }, this.config.transitionDuration);
       }
@@ -808,33 +781,23 @@ var Roll = /*#__PURE__*/function () {
         console.log('🔄 Wrap animation: first → last (animating DOWN)');
         var lastItem = this.itemElements[totalItems - 1];
 
-        // Disable transition for instantaneous snap
-        this.container.style.transition = 'none';
+        // Temporarily move the last item physically *above* the first item.
+        // The last item naturally sits at (totalItems-1)*100% in the flex column.
+        // We shift it up by totalItems*100% so it lands at -100% (one slot above item 0).
+        var _shiftAmount = -totalItems * 100;
+        lastItem.style.transform = "translateY(".concat(_shiftAmount, "%)");
 
-        // Use flex 'order' to physically place the last item at the very beginning of the flex list.
-        lastItem.style.order = '-1';
+        // Animate container down by exactly one viewport height to reveal the repositioned last item.
+        // Container is currently at translateY(0%). Moving to translateY(100%) shifts the viewport
+        // up to show the -100% to 0% range, which is exactly where the last item now sits.
+        this.container.style.transform = "translateY(100%)";
 
-        // Because we moved the last item to the front, the first item is now physically at offset 1 (100%).
-        // We snap the container to -100% to keep the first item perfectly in view before animating.
-        var _snapOffset = -100;
-        this.container.style.transform = "translateY(".concat(_snapOffset, "%)");
-
-        // Force reflow
-        this.container.offsetHeight;
-
-        // Re-enable transition
-        this.container.style.transition = "transform ".concat(this.config.transitionDuration, "ms ease-in-out");
-
-        // Animate container to 0% to reveal the last item (now sitting at the very front)
-        var _animateOffset = 0;
-        this.container.style.transform = "translateY(".concat(_animateOffset, "%)");
-
-        // After animation completes, restore true states
+        // After animation completes, snap everything back to accurate final state invisibly
         setTimeout(function () {
           _this3.container.style.transition = 'none';
 
-          // Restore natural flex layout
-          lastItem.style.order = '0';
+          // Remove individual element transform
+          lastItem.style.transform = '';
 
           // Snap container to true last item position
           var finalOffset = -(totalItems - 1) * 100;
@@ -892,13 +855,13 @@ if ( true && module.exports) {
   module.exports = Roll;
 }
 
-/***/ }),
+/***/ },
 
-/***/ "./src/js/handlers/AutoplayHandler.js":
+/***/ "./src/js/handlers/AutoplayHandler.js"
 /*!********************************************!*\
   !*** ./src/js/handlers/AutoplayHandler.js ***!
   \********************************************/
-/***/ ((module) => {
+(module) {
 
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function _classCallCheck(a, n) { if (!(a instanceof n)) throw new TypeError("Cannot call a class as a function"); }
@@ -1052,13 +1015,13 @@ if ( true && module.exports) {
   module.exports = AutoplayHandler;
 }
 
-/***/ }),
+/***/ },
 
-/***/ "./src/js/handlers/KeyboardHandler.js":
+/***/ "./src/js/handlers/KeyboardHandler.js"
 /*!********************************************!*\
   !*** ./src/js/handlers/KeyboardHandler.js ***!
   \********************************************/
-/***/ ((module) => {
+(module) {
 
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function _classCallCheck(a, n) { if (!(a instanceof n)) throw new TypeError("Cannot call a class as a function"); }
@@ -1228,13 +1191,13 @@ if ( true && module.exports) {
   module.exports = KeyboardHandler;
 }
 
-/***/ }),
+/***/ },
 
-/***/ "./src/js/handlers/MouseDragHandler.js":
+/***/ "./src/js/handlers/MouseDragHandler.js"
 /*!*********************************************!*\
   !*** ./src/js/handlers/MouseDragHandler.js ***!
   \*********************************************/
-/***/ ((module) => {
+(module) {
 
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function _classCallCheck(a, n) { if (!(a instanceof n)) throw new TypeError("Cannot call a class as a function"); }
@@ -1469,13 +1432,13 @@ if ( true && module.exports) {
   module.exports = MouseDragHandler;
 }
 
-/***/ }),
+/***/ },
 
-/***/ "./src/js/handlers/TouchHandler.js":
+/***/ "./src/js/handlers/TouchHandler.js"
 /*!*****************************************!*\
   !*** ./src/js/handlers/TouchHandler.js ***!
   \*****************************************/
-/***/ ((module) => {
+(module) {
 
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function _classCallCheck(a, n) { if (!(a instanceof n)) throw new TypeError("Cannot call a class as a function"); }
@@ -1687,13 +1650,13 @@ if ( true && module.exports) {
   module.exports = TouchHandler;
 }
 
-/***/ }),
+/***/ },
 
-/***/ "./src/js/handlers/WheelHandler.js":
+/***/ "./src/js/handlers/WheelHandler.js"
 /*!*****************************************!*\
   !*** ./src/js/handlers/WheelHandler.js ***!
   \*****************************************/
-/***/ ((module) => {
+(module) {
 
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function _classCallCheck(a, n) { if (!(a instanceof n)) throw new TypeError("Cannot call a class as a function"); }
@@ -1818,13 +1781,13 @@ if ( true && module.exports) {
   module.exports = WheelHandler;
 }
 
-/***/ }),
+/***/ },
 
-/***/ "./src/js/index.js":
+/***/ "./src/js/index.js"
 /*!*************************!*\
   !*** ./src/js/index.js ***!
   \*************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
@@ -1949,14 +1912,18 @@ var SWR = /*#__PURE__*/function () {
       // Merge data attributes into config
       this.config = _parsers_ConfigParser__WEBPACK_IMPORTED_MODULE_0___default().parse(_objectSpread(_objectSpread({}, this.config), dataConfig));
 
-      // Setup roll DOM
+      // Setup roll DOM (preserves existing data-swr-item elements)
       this.roll.initialize();
+
+      // Track whether items came from DOM (already rendered) or config (need rendering)
+      var itemsFromDOM = false;
 
       // Add items (from data attributes or config)
       if (dataItems.length > 0) {
         dataItems.forEach(function (item) {
           return _this.mediaManager.addItem(item);
         });
+        itemsFromDOM = true;
       } else if (this.config.items) {
         this.config.items.forEach(function (item) {
           return _this.mediaManager.addItem(item);
@@ -1967,8 +1934,11 @@ var SWR = /*#__PURE__*/function () {
       var itemCount = this.mediaManager.getItemCount();
       this.navigation.initialize(itemCount);
 
-      // Render initial items
-      this.renderItems();
+      // Only render items if they came from JS config, not from DOM attributes.
+      // When items are from DOM, setupDOM() already preserved the original content.
+      if (!itemsFromDOM) {
+        this.renderItems();
+      }
 
       // Setup handlers
       this.setupHandlers();
@@ -2403,13 +2373,13 @@ var SWR = /*#__PURE__*/function () {
 }(); // ES6 export (webpack will handle UMD conversion)
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (SWR);
 
-/***/ }),
+/***/ },
 
-/***/ "./src/js/parsers/ConfigParser.js":
+/***/ "./src/js/parsers/ConfigParser.js"
 /*!****************************************!*\
   !*** ./src/js/parsers/ConfigParser.js ***!
   \****************************************/
-/***/ ((module) => {
+(module) {
 
 function _slicedToArray(r, e) { return _arrayWithHoles(r) || _iterableToArrayLimit(r, e) || _unsupportedIterableToArray(r, e) || _nonIterableRest(); }
 function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
@@ -2557,13 +2527,13 @@ if ( true && module.exports) {
   module.exports = ConfigParser;
 }
 
-/***/ }),
+/***/ },
 
-/***/ "./src/js/parsers/DataAttributeParser.js":
+/***/ "./src/js/parsers/DataAttributeParser.js"
 /*!***********************************************!*\
   !*** ./src/js/parsers/DataAttributeParser.js ***!
   \***********************************************/
-/***/ ((module) => {
+(module) {
 
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function _classCallCheck(a, n) { if (!(a instanceof n)) throw new TypeError("Cannot call a class as a function"); }
@@ -2711,13 +2681,13 @@ if ( true && module.exports) {
   module.exports = DataAttributeParser;
 }
 
-/***/ }),
+/***/ },
 
-/***/ "./src/js/renderers/HTMLRenderer.js":
+/***/ "./src/js/renderers/HTMLRenderer.js"
 /*!******************************************!*\
   !*** ./src/js/renderers/HTMLRenderer.js ***!
   \******************************************/
-/***/ ((module) => {
+(module) {
 
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function _classCallCheck(a, n) { if (!(a instanceof n)) throw new TypeError("Cannot call a class as a function"); }
@@ -2752,13 +2722,13 @@ if ( true && module.exports) {
   module.exports = HTMLRenderer;
 }
 
-/***/ }),
+/***/ },
 
-/***/ "./src/js/renderers/ImageRenderer.js":
+/***/ "./src/js/renderers/ImageRenderer.js"
 /*!*******************************************!*\
   !*** ./src/js/renderers/ImageRenderer.js ***!
   \*******************************************/
-/***/ ((module) => {
+(module) {
 
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function _classCallCheck(a, n) { if (!(a instanceof n)) throw new TypeError("Cannot call a class as a function"); }
@@ -2804,13 +2774,13 @@ if ( true && module.exports) {
   module.exports = ImageRenderer;
 }
 
-/***/ }),
+/***/ },
 
-/***/ "./src/js/renderers/VideoRenderer.js":
+/***/ "./src/js/renderers/VideoRenderer.js"
 /*!*******************************************!*\
   !*** ./src/js/renderers/VideoRenderer.js ***!
   \*******************************************/
-/***/ ((module) => {
+(module) {
 
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function _classCallCheck(a, n) { if (!(a instanceof n)) throw new TypeError("Cannot call a class as a function"); }
@@ -2865,7 +2835,20 @@ if ( true && module.exports) {
   module.exports = VideoRenderer;
 }
 
-/***/ })
+/***/ },
+
+/***/ "./src/css/swr.css"
+/*!*************************!*\
+  !*** ./src/css/swr.css ***!
+  \*************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+// extracted by mini-css-extract-plugin
+
+
+/***/ }
 
 /******/ 	});
 /************************************************************************/
@@ -2887,6 +2870,12 @@ if ( true && module.exports) {
 /******/ 		};
 /******/ 	
 /******/ 		// Execute the module function
+/******/ 		if (!(moduleId in __webpack_modules__)) {
+/******/ 			delete __webpack_module_cache__[moduleId];
+/******/ 			var e = new Error("Cannot find module '" + moduleId + "'");
+/******/ 			e.code = 'MODULE_NOT_FOUND';
+/******/ 			throw e;
+/******/ 		}
 /******/ 		__webpack_modules__[moduleId](module, module.exports, __webpack_require__);
 /******/ 	
 /******/ 		// Return the exports of the module

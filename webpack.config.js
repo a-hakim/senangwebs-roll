@@ -1,6 +1,18 @@
 const path = require('path');
+const fs = require('fs');
 const TerserPlugin = require('terser-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+
+class CopyTypeDeclarationsPlugin {
+  apply(compiler) {
+    compiler.hooks.afterEmit.tap('CopyTypeDeclarationsPlugin', () => {
+      fs.copyFileSync(
+        path.resolve(__dirname, 'src/swr.d.ts'),
+        path.resolve(__dirname, 'dist/swr.d.ts')
+      );
+    });
+  }
+}
 
 module.exports = (env, argv) => {
   const isDevelopment = argv.mode === 'development';
@@ -44,6 +56,7 @@ module.exports = (env, argv) => {
       new MiniCssExtractPlugin({
         filename: isDevelopment ? '[name].css' : '[name].min.css',
       }),
+      new CopyTypeDeclarationsPlugin(),
     ],
     optimization: {
       minimize: !isDevelopment,

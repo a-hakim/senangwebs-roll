@@ -24,11 +24,33 @@ A lightweight, responsive roll library for creating mobile-like media rolls simi
 
 ### Installation
 
-Include the compiled CSS and JS files in your HTML:
+Install from npm:
+
+```bash
+npm install senangwebs-roll
+```
+
+The package includes TypeScript declarations for its configuration, item types, and public methods.
+
+Or include the compiled CSS and JS files directly in your HTML:
 
 ```html
 <link rel="stylesheet" href="https://unpkg.com/senangwebs-roll@latest/dist/swr.min.css">
 <script src="https://unpkg.com/senangwebs-roll@latest/dist/swr.min.js"></script>
+```
+
+For a TypeScript or bundled JavaScript project:
+
+```typescript
+import SWR = require('senangwebs-roll');
+import 'senangwebs-roll/dist/swr.css';
+
+const roll = new SWR('#myRoll', {
+    loop: true,
+    items: [
+        { type: 'image', src: 'image.jpg', alt: 'Demo image' }
+    ]
+});
 ```
 
 ### Method 1: JavaScript API (Recommended)
