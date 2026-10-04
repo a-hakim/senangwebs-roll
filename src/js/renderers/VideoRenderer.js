@@ -12,13 +12,15 @@ class VideoRenderer {
     container.className = 'swr-video-item';
 
     const video = document.createElement('video');
-    video.width = '100%';
-    video.height = '100%';
+    video.style.width = '100%';
+    video.style.height = '100%';
     video.style.objectFit = 'cover';
 
     // Set video attributes
-    if (item.autoplay) video.setAttribute('autoplay', 'autoplay');
-    if (item.muted) video.setAttribute('muted', 'muted');
+    // SWR owns autoplay; native autoplay would also start hidden slides.
+    video.preload = 'metadata';
+    video.muted = !!item.muted;
+    video.defaultMuted = !!item.muted;
     if (item.playsinline) video.setAttribute('playsinline', 'playsinline');
     if (item.loop) video.setAttribute('loop', 'loop');
     if (item.controls !== false) video.setAttribute('controls', 'controls');

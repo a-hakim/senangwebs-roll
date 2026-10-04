@@ -35,13 +35,18 @@ class DataAttributeParser {
 
     // Parse numeric attributes
     const autoplayInterval = element.getAttribute('data-swr-autoplay-interval');
-    if (autoplayInterval) config.autoplayInterval = parseInt(autoplayInterval, 10);
+    if (autoplayInterval !== null) config.autoplayInterval = Number(autoplayInterval);
 
     const transitionDuration = element.getAttribute('data-swr-transition');
-    if (transitionDuration) config.transitionDuration = parseInt(transitionDuration, 10);
+    if (transitionDuration !== null) config.transitionDuration = Number(transitionDuration);
 
     const swipeThreshold = element.getAttribute('data-swr-swipe-threshold');
-    if (swipeThreshold) config.swipeThreshold = parseInt(swipeThreshold, 10);
+    if (swipeThreshold !== null) config.swipeThreshold = Number(swipeThreshold);
+
+    const pauseOnInteraction = element.getAttribute('data-swr-autoplay-pause-on-interaction');
+    if (pauseOnInteraction !== null) config.enableAutoplayPauseOnInteraction = pauseOnInteraction === '' || pauseOnInteraction === 'true';
+    const resumeDelay = element.getAttribute('data-swr-autoplay-resume-delay');
+    if (resumeDelay !== null) config.autoplayResumeDelay = Number(resumeDelay);
 
     return config;
   }
@@ -53,7 +58,7 @@ class DataAttributeParser {
    */
   static parseItems(element) {
     const items = [];
-    const itemElements = element.querySelectorAll('[data-swr-item]');
+    const itemElements = this.getItemElements(element);
 
     itemElements.forEach((itemEl) => {
       const item = this.parseItemElement(itemEl);
@@ -68,6 +73,14 @@ class DataAttributeParser {
    * @param {HTMLElement} itemEl - Item element
    * @returns {Object|null} Item object or null if invalid
    */
+  static getItemElements(element) {
+    return Array.from(element.querySelectorAll('[data-swr-item]')).filter(item => {
+      const parentItem = item.parentElement?.closest('[data-swr-item]');
+      const owner = item.parentElement?.closest('[data-swr],.swr');
+      return (!parentItem || !element.contains(parentItem)) && (!owner || owner === element || !element.contains(owner));
+    });
+  }
+
   static parseItemElement(itemEl) {
     // Check if item contains a video
     const videoEl = itemEl.querySelector('video');
@@ -113,6 +126,7 @@ class DataAttributeParser {
       muted: videoEl.hasAttribute('muted'),
       playsinline: videoEl.hasAttribute('playsinline'),
       loop: videoEl.hasAttribute('loop'),
+      controls: videoEl.hasAttribute('controls'),
     };
   }
 

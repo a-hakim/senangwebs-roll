@@ -42,19 +42,12 @@ if (typeof window !== 'undefined') {
   // Auto-initialize all rolls with data-swr attribute
   // This runs when DOM is ready
   const initDataAttributeRolls = () => {
-    const rolls = document.querySelectorAll('[data-swr]:not([data-swr-initialized])');
-    rolls.forEach((element) => {
-      // Mark as initialized to prevent duplicate initialization
-      element.setAttribute('data-swr-initialized', 'true');
-      // Initialize the roll
-      new SWR(element);
-      console.log('✅ Auto-initialized SWR from data attributes:', element);
-    });
+    SWR.initAll(document);
   };
 
   // Run on DOM ready
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initDataAttributeRolls);
+    document.addEventListener('DOMContentLoaded', initDataAttributeRolls, { once: true });
   } else {
     // DOM is already loaded
     initDataAttributeRolls();

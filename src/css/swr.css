@@ -45,8 +45,8 @@
   background-color: #000;
   background-size: cover;
   background-position: center;
-  /* Prevent all native touch scrolling - critical for Instagram Reels behavior */
-  touch-action: none;
+  /* The gesture handler cancels accepted vertical movement; controls and zoom remain native. */
+  touch-action: auto;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
   /* Prevent text selection during touch */
@@ -67,23 +67,23 @@
 }
 
 /* Items - Instagram Reels style: prevent all internal scrolling */
-[data-swr-item] {
+.swr-container > [data-swr-item] {
   flex: 0 0 100%;
   width: 100%;
   height: 100%;
   overflow: hidden;
-  /* Critical: Prevent touch events from being handled by children */
-  touch-action: none;
+  /* Preserve the owning viewport's native touch behavior. */
+  touch-action: inherit;
   -webkit-user-select: none;
   -moz-user-select: none;
   user-select: none;
 }
 
-.swr-html-item >  * {
+.swr-html-item > * {
   width: 100%;
-  /* Prevent child elements from capturing touch events */
-  pointer-events: none;
-  touch-action: none;
+  /* Custom HTML controls keep their native pointer behavior. */
+  pointer-events: auto;
+  touch-action: auto;
 }
 
 /* HTML Item - Instagram Reels style: no internal scrolling */
@@ -95,7 +95,7 @@
   height: 100%;
   overflow: hidden;
   padding: 0;
-  touch-action: none;
+  touch-action: inherit;
 }
 
 /* Video Item */
@@ -105,7 +105,7 @@
   height: 100%;
   background-color: #000;
   overflow: hidden;
-  touch-action: none;
+  touch-action: inherit;
 }
 
 .swr-video-item video {
@@ -117,7 +117,7 @@
   object-fit: cover;
   /* Allow video controls but prevent touch scrolling */
   pointer-events: auto;
-  touch-action: none;
+  touch-action: auto;
 }
 
 /* Image Item */
@@ -127,7 +127,7 @@
   height: 100%;
   background-color: #000;
   overflow: hidden;
-  touch-action: none;
+  touch-action: inherit;
 }
 
 .swr-image-item img {
@@ -140,30 +140,10 @@
   display: block;
   /* Prevent image dragging interference */
   pointer-events: none;
-  touch-action: none;
+  touch-action: inherit;
 }
 
-/* Responsive - Mobile */
-@media (max-width: 768px) {
-  .swr-viewport {
-    aspect-ratio: 9 / 16;
-  }
-
-  .swr-container {
-    transition-duration: 300ms;
-  }
-}
-
-/* Responsive - Desktop */
-@media (min-width: 769px) {
-  .swr-viewport {
-    aspect-ratio: 16 / 9;
-  }
-
-  .swr-container {
-    transition-duration: 400ms;
-  }
-}
+/* JavaScript applies the configured fixed ratio and transition duration on all devices. */
 
 /* Touch-friendly styles */
 .swr {
@@ -230,4 +210,22 @@
 .swr:focus-within {
   outline: 2px solid #4a90e2;
   outline-offset: 2px;
+}
+
+/* Keep announcements available to assistive technology without changing layout. */
+.swr-status {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.swr :is(input, textarea, [contenteditable="true"]) {
+  user-select: text;
+  -webkit-user-select: text;
+  -webkit-touch-callout: default;
 }

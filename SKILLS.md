@@ -1,7 +1,7 @@
 ---
 name: senangwebs-roll
 description: Mobile-style vertical media roll (Reels/Shorts-like) for images, videos, and HTML with touch, keyboard, and mouse navigation.
-version: 1.0.2
+version: 1.1.0
 package: senangwebs-roll
 ---
 
@@ -28,6 +28,8 @@ Start in `C:\wamp64\www\sw-libraries\senangwebs-roll`. Read `README.md`, `packag
 | `data-swr-loop` | Enable or disable looping |
 | `data-swr-autoplay` | Enable or disable autoplay |
 | `data-swr-autoplay-interval` | Autoplay interval in milliseconds |
+| `data-swr-autoplay-pause-on-interaction` | Pause slide autoplay temporarily during navigation input |
+| `data-swr-autoplay-resume-delay` | Temporary pause duration in milliseconds |
 | `data-swr-keyboard` | Enable or disable keyboard navigation |
 | `data-swr-touch` | Enable or disable touch navigation |
 | `data-swr-wheel` | Enable or disable wheel navigation |
@@ -81,7 +83,7 @@ roll.destroy()
 - Infinite scrolling: seamless wrap-around without DOM duplication issues
 - Dynamic item management: keep media, navigation, and rendered DOM state aligned
 - Aspect ratio enforcement
-- TypeScript declarations: edit `src/swr.d.ts`; webpack copies it to
+- TypeScript declarations: edit `src/swr.d.ts`; webpack emits it to
   `dist/swr.d.ts` during development and production builds
 
 ## Implementation Guidance
@@ -96,8 +98,14 @@ roll.destroy()
 ```bash
 npm run build
 npm run build:dev
-npm run serve    # webpack dev server at http://localhost:8080
+npm run serve    # local preview at http://127.0.0.1:8080
 ```
 
 After changing the public API, update `src/swr.d.ts`, run both builds, and
 confirm `dist/swr.d.ts` is present in the package output.
+
+## Production integration
+
+Use Node 22.15+ and npm 10+ for development. Native ESM is `dist/swr.mjs` with `dist/swr.d.mts`; importing it never initializes markup. Call `SWR.initAll(root)` explicitly and retrieve instances with `SWR.getInstance(selector)`. CommonJS and CDN constructor exports remain compatible.
+
+The fixed default ratio is 9:16. Custom HTML must be trusted/sanitized by the caller. Only active videos may autoplay. `initialized` fires in a microtask and `destroy` fires once before subscriptions are cleared. Follow AGENTS.md and obtain unit-test authorization before running checks. See CONTRIBUTING.md for package, CI, browser, and physical-device release verification.

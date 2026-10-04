@@ -18,7 +18,7 @@ A lightweight, responsive roll library for creating mobile-like media rolls simi
 - **Lightweight & Responsive**: Optimized for both mobile and desktop devices
 - **No Dependencies**: Pure vanilla JavaScript, no external libraries required
 - **Event System**: Custom events for complete control over roll behavior
-- **Accessible**: Keyboard navigation and accessibility-friendly markup
+- **Accessibility**: Labeled slides, inactive-slide inertness, keyboard navigation, and reduced motion support
 
 ## Quick Start
 
@@ -32,17 +32,19 @@ npm install senangwebs-roll
 
 The package includes TypeScript declarations for its configuration, item types, and public methods.
 
+For CommonJS, the existing constructor export remains available: `const SWR = require('senangwebs-roll')`.
+
 Or include the compiled CSS and JS files directly in your HTML:
 
 ```html
-<link rel="stylesheet" href="https://unpkg.com/senangwebs-roll@latest/dist/swr.min.css">
-<script src="https://unpkg.com/senangwebs-roll@latest/dist/swr.min.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/senangwebs-roll@1.1.0/dist/swr.min.css">
+<script src="https://unpkg.com/senangwebs-roll@1.1.0/dist/swr.min.js"></script>
 ```
 
 For a TypeScript or bundled JavaScript project:
 
 ```typescript
-import SWR = require('senangwebs-roll');
+import SWR from 'senangwebs-roll';
 import 'senangwebs-roll/dist/swr.css';
 
 const roll = new SWR('#myRoll', {
@@ -56,11 +58,11 @@ const roll = new SWR('#myRoll', {
 ### Method 1: JavaScript API (Recommended)
 
 ```html
-<link rel="stylesheet" href="https://unpkg.com/senangwebs-roll@latest/dist/swr.min.css">
+<link rel="stylesheet" href="https://unpkg.com/senangwebs-roll@1.1.0/dist/swr.min.css">
 
 <div id="myRoll"></div>
 
-<script src="https://unpkg.com/senangwebs-roll@latest/dist/swr.min.js"></script>
+<script src="https://unpkg.com/senangwebs-roll@1.1.0/dist/swr.min.js"></script>
 <script>
 const roll = new SWR('#myRoll', {
     aspectRatio: '9:16',
@@ -91,7 +93,7 @@ const roll = new SWR('#myRoll', {
 ### Method 2: HTML Data Attributes
 
 ```html
-<link rel="stylesheet" href="https://unpkg.com/senangwebs-roll@latest/dist/swr.min.css">
+<link rel="stylesheet" href="https://unpkg.com/senangwebs-roll@1.1.0/dist/swr.min.css">
 <!-- Automatically initializes on page load - no JavaScript required! -->
 <div data-swr 
      data-swr-aspect-ratio="9:16" 
@@ -112,7 +114,7 @@ const roll = new SWR('#myRoll', {
         </div>
     </div>
 </div>
-<script src="https://unpkg.com/senangwebs-roll@latest/dist/swr.min.js"></script>
+<script src="https://unpkg.com/senangwebs-roll@1.1.0/dist/swr.min.js"></script>
 ```
 
 ## Configuration Options
@@ -142,6 +144,8 @@ Use HTML data attributes for configuration:
   data-swr-loop="true"
   data-swr-autoplay="true"
   data-swr-autoplay-interval="4000"
+  data-swr-autoplay-pause-on-interaction="true"
+  data-swr-autoplay-resume-delay="3000"
   data-swr-keyboard="true"
   data-swr-touch="true"
   data-swr-transition="300"
@@ -179,11 +183,13 @@ Use HTML data attributes for configuration:
 
 #### Lifecycle
 
-- **`destroy()`** - Destroy instance and clean up resources
+- **`destroy()`** - Cancel pending work, pause managed videos, remove handlers, and restore the original DOM nodes and owned attributes
+- **`SWR.getInstance(selector)`** - Get an existing instance or `null`
+- **`SWR.initAll(root?)`** - Initialize `[data-swr]` elements in a document or subtree and return their instances
 
 ### Events
 
-- **`initialized`** - Emitted when roll is initialized
+- **`initialized`** - Emitted in a microtask after initialization; subscribe immediately after construction
 - **`navigationChanged`** - Emitted when active item changes
 - **`slideStarted`** - Emitted when slide animation starts
 - **`slideCompleted`** - Emitted when slide animation completes
@@ -202,7 +208,8 @@ Use HTML data attributes for configuration:
 - **`itemRemoved`** - Emitted when item is removed
 - **`itemUpdated`** - Emitted when item is updated
 - **`itemsCleared`** - Emitted when all items are cleared
-- **`destroy`** - Emitted when instance is destroyed
+- **`mediaPlaybackError`** - Emitted with `{ index, error }` when active-video autoplay is rejected
+- **`destroy`** - Emitted once after cleanup, before subscriptions are cleared
 
 ### Item Object Structure
 
@@ -236,6 +243,30 @@ Use HTML data attributes for configuration:
     content: '<div>HTML content</div>'
 }
 ```
+
+## Initialization and Lifecycle
+
+The UMD/CDN build initializes `[data-swr]` markup on DOM ready. Native ESM imports have no automatic DOM initialization or global assignments; call `new SWR(...)` or `SWR.initAll(document)` explicitly. Imports are safe during server rendering, but constructing an instance requires a browser DOM.
+
+```javascript
+import SWR from 'senangwebs-roll';
+import 'senangwebs-roll/dist/swr.css';
+
+const instances = SWR.initAll(document);
+const roll = SWR.getInstance('#myRoll');
+```
+
+Configuration precedence is defaults → JavaScript options → data attributes. Existing DOM slides take precedence over configured `items`. Duplicate construction returns the existing instance and does not apply new options. Destroy the instance before reconfiguring it. Newly inserted markup is initialized by another explicit `SWR.initAll(subtree)` call.
+
+Navigation during an active transition is ignored before state changes. Item insertion/removal settles the transition, updates actual DOM nodes, and preserves the active item when possible. Removing the active item selects the next item, or the previous item at the end. Invalid navigation/removal indices do nothing; invalid insertion positions append. Empty and single-slide rolls do not run slide autoplay.
+
+## Video Playback and Trusted HTML
+
+Slide autoplay (`play()`/`pause()`) is separate from each video item's `autoplay` option. SWR plays a video automatically only when its slide is active and that video requests autoplay. It pauses hidden videos and suspends automatic playback when the document or roll is hidden. A rejected `video.play()` emits `mediaPlaybackError`; it never becomes an unhandled promise rejection. Use muted inline video for mobile autoplay, and keep native controls available when playback may require user interaction.
+
+Custom HTML `content` is inserted as trusted markup. **SWR does not sanitize HTML.** Sanitize user-generated or external content before passing it to SWR. DOM slides retain their original nodes and application listeners.
+
+Gesture starts on links, forms, editable content, native media controls, or `[data-swr-ignore]` are reserved for those controls. Set a video item's `controls: false` when its entire video surface should accept roll gestures. Pinch zoom is permitted. Touch-derived clicks are deduplicated. Keyboard shortcuts target the focused roll, with hover fallback outside another roll; editable/control targets retain their keys.
 
 ## Seamless Infinite Scrolling
 
@@ -378,10 +409,7 @@ roll.on('autoplayPause', () => console.log('Paused'));
 ### Example 6: Custom Styling
 
 ```css
-/* Override default aspect ratio */
-.my-roll .swr-viewport {
-    aspect-ratio: 16 / 9;
-}
+/* Set aspectRatio through configuration or data-swr-aspect-ratio. */
 
 /* Customize item styling */
 .my-roll [data-swr-item] {
@@ -390,7 +418,7 @@ roll.on('autoplayPause', () => console.log('Paused'));
 
 /* Custom transition */
 .my-roll .swr-container {
-    transition-timing-function: cubic-bezier(0.25, 0.1, 0.25, 1);
+    transition-timing-function: cubic-bezier(0.25, 0.1, 0.25, 1) !important;
 }
 ```
 
@@ -410,12 +438,7 @@ roll.on('autoplayPause', () => console.log('Paused'));
 
 ## Responsive Behavior
 
-The roll automatically adapts to different screen sizes:
-
-- **Mobile** (< 768px) - Aspect ratio 9:16, optimized for portrait viewing
-- **Desktop** (≥ 768px) - Aspect ratio 16:9, optimized for landscape viewing
-
-Customize aspect ratios via configuration.
+The roll scales to its container width and keeps a fixed **9:16** aspect ratio by default on both mobile and desktop. Configure `aspectRatio` (for example, `16:9` or `1:1`) to choose another fixed ratio. Automatic breakpoint-based ratio switching is not part of v1.
 
 ## Important Behaviors
 
@@ -433,15 +456,18 @@ Customize aspect ratios via configuration.
 ### Interaction Pausing
 - When `enableAutoplayPauseOnInteraction: true`, user interactions (swipe, tap, keyboard, wheel, drag) temporarily pause autoplay
 - Autoplay resumes after `autoplayResumeDelay` milliseconds
-- Tap/click on the roll toggles autoplay on/off
+- Tap/click on the noninteractive roll surface toggles autoplay on/off
+- Explicit `pause()` cancels temporary resumption; nonlooping autoplay stops at the last slide
+- Visibility suspension resumes only playback that was requested before suspension
 
 ## Accessibility
 
 - Keyboard navigation support (arrow keys)
-- Semantic HTML markup
-- Focus management
-- High contrast support
-- Reduced motion support (via `prefers-reduced-motion`)
+- Region and slide labels; provide an `aria-label` or `aria-labelledby` on each roll
+- Inactive slides use `inert` and `aria-hidden`; focus moves to the roll when its active control disappears
+- Manual navigation is announced through a polite live region
+- Native links, forms, editable content, and video controls retain input handling
+- High contrast styles and immediate transitions under `prefers-reduced-motion`
 
 ## Browser Support
 

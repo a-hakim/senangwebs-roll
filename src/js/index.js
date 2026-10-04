@@ -1,9 +1,3 @@
-/**
- * SenangWebs Roll (SWR) - Main class
- * Lightweight roll library for creating responsive media rolls
- */
-
-// Import dependencies - webpack will convert CommonJS exports to ES6
 import ConfigParser from './parsers/ConfigParser';
 import DataAttributeParser from './parsers/DataAttributeParser';
 import EventManager from './core/EventManager';
@@ -19,503 +13,368 @@ import HTMLRenderer from './renderers/HTMLRenderer';
 import VideoRenderer from './renderers/VideoRenderer';
 import ImageRenderer from './renderers/ImageRenderer';
 
+const INSTANCE = Symbol.for('senangwebs-roll.instance');
+const ROOT_ATTRIBUTES = ['class', 'role', 'aria-roledescription', 'aria-label', 'tabindex', 'data-swr-initialized'];
+const SLIDE_ATTRIBUTES = ['role', 'aria-roledescription', 'aria-label', 'aria-hidden', 'inert'];
+const capture = (element, names) => names.map(name => [name, element.getAttribute(name)]);
+const restore = (element, attributes) => attributes.forEach(([name, value]) => {
+  if (value === null) element.removeAttribute(name); else element.setAttribute(name, value);
+});
+const resolveElement = selector => {
+  if (typeof selector !== 'string') return selector;
+  if (typeof document === 'undefined') return null;
+  try { return document.querySelector(selector); } catch { return null; }
+};
+
+/** Browser-independent imports; DOM access begins only at construction/initAll. */
 class SWR {
-  /**
-   * Constructor
-   * @param {string|HTMLElement} selector - CSS selector or DOM element
-   * @param {Object} config - Configuration object
-   */
+  static getInstance(selector) { return resolveElement(selector)?.[INSTANCE] || null; }
+  static initAll(root) {
+    const scope = root || (typeof document !== 'undefined' ? document : null);
+    if (!scope?.querySelectorAll) return [];
+    const elements = [...(scope.matches?.('[data-swr]') ? [scope] : []),
+      ...scope.querySelectorAll('[data-swr]')];
+    return elements.map(element => SWR.getInstance(element) || new SWR(element));
+  }
   constructor(selector, config = {}) {
-    // Get element
-    this.element = typeof selector === 'string' ? document.querySelector(selector) : selector;
-
-    if (!this.element) {
-      throw new Error(`Element not found: ${selector}`);
+    this.element = resolveElement(selector);
+    if (!this.element || this.element.nodeType !== 1 || !this.element.ownerDocument) {
+      throw new Error('Element not found: ' + selector);
     }
-
-    // Parse configuration
-    this.config = ConfigParser.parse(config);
-
-    // Initialize core components
+    if (this.element[INSTANCE]) return this.element[INSTANCE];
+    this.document = this.element.ownerDocument;
+    this.window = this.document.defaultView;
+    this.config = ConfigParser.parse({ ...(config && typeof config === 'object' ? config : {}),
+      ...DataAttributeParser.parseConfig(this.element) });
     this.eventManager = new EventManager();
     this.mediaManager = new MediaManager(this.eventManager);
+    this.config.items = this.config.items.filter(item => this.mediaManager.validateItem(item));
     this.navigation = new Navigation(this.eventManager, this.config);
     this.roll = new Roll(this.element, this.eventManager, this.config);
-
-    // Initialize handlers
-    this.touchHandler = null;
-    this.keyboardHandler = null;
-    this.wheelHandler = null;
-    this.mouseDragHandler = null;
-    this.autoplayHandler = null;
-
-    // Renderers
-    this.renderers = {
-      html: new HTMLRenderer(),
-      video: new VideoRenderer(),
-      image: new ImageRenderer(),
-    };
-
-    // State
+    this.renderers = { html: new HTMLRenderer(), video: new VideoRenderer(), image: new ImageRenderer() };
     this.isInitialized = false;
     this.isDestroyed = false;
-
-    // Initialize the roll
-    this.init();
+    this.isMutating = false;
+    this.isNavigating = false;
+    this.isVisible = true;
+    this.originalFocus = this.element.contains(this.document.activeElement) ? this.document.activeElement : null;
+    this.originalChildren = Array.from(this.element.childNodes);
+    this.originalAttributes = capture(this.element, ROOT_ATTRIBUTES);
+    this.originalItems = DataAttributeParser.getItemElements(this.element).map(element => ({
+      element, parent: element.parentNode, next: element.nextSibling,
+      attributes: capture(element, SLIDE_ATTRIBUTES),
+    }));
+    this.slideAttributes = new Map();
+    this.videoAutoplay = new Map();
+    this.mediaGeneration = 0;
+    this.motionQuery = this.window?.matchMedia?.('(prefers-reduced-motion: reduce)');
+    this.boundMotion = event => {
+      if ((event.matches ?? this.motionQuery.matches) && this.roll?.isAnimating) {
+        const index = this.roll.currentIndex;
+        this.roll.cancelTransition();
+        this.eventManager.emit('slideCompleted', { index });
+      }
+    };
+    Object.defineProperty(this.element, INSTANCE, { value: this, configurable: true });
+    try { this.init(); } catch (error) { this.destroy(); throw error; }
   }
-
-  /**
-   * Initialize the SWR instance
-   * @private
-   */
   init() {
-    // Check for data attributes or existing items
-    const dataConfig = DataAttributeParser.parseConfig(this.element);
-    const dataItems = DataAttributeParser.parseItems(this.element);
-
-    // Merge data attributes into config
-    this.config = ConfigParser.parse({ ...this.config, ...dataConfig });
-
-    // Setup roll DOM (preserves existing data-swr-item elements)
-    this.roll.initialize();
-
-    // Track whether items came from DOM (already rendered) or config (need rendering)
-    let itemsFromDOM = false;
-
-    // Add items (from data attributes or config)
-    if (dataItems.length > 0) {
-      dataItems.forEach((item) => this.mediaManager.addItem(item));
-      itemsFromDOM = true;
-    } else if (this.config.items) {
-      this.config.items.forEach((item) => this.mediaManager.addItem(item));
+    const validDOM = this.originalItems.filter(({ element }) =>
+      this.mediaManager.validateItem(DataAttributeParser.parseItemElement(element)));
+    this.roll.initialize(validDOM.map(entry => entry.element));
+    if (this.originalItems.length) {
+      validDOM.forEach(({ element }) => this.mediaManager.addItem(DataAttributeParser.parseItemElement(element), null, false));
+    } else {
+      this.config.items.forEach(item => {
+        if (this.mediaManager.addItem(item, null, false)) {
+          const index = this.mediaManager.getItemCount() - 1;
+          this.roll.renderItem(index, this.getRenderer(item.type), item);
+        }
+      });
     }
-
-    // Initialize navigation
-    const itemCount = this.mediaManager.getItemCount();
-    this.navigation.initialize(itemCount);
-
-    // Only render items if they came from JS config, not from DOM attributes.
-    // When items are from DOM, setupDOM() already preserved the original content.
-    if (!itemsFromDOM) {
-      this.renderItems();
+    this.navigation.initialize(this.mediaManager.getItemCount());
+    if (!this.element.hasAttribute('role')) this.element.setAttribute('role', 'region');
+    if (!this.element.hasAttribute('aria-roledescription')) this.element.setAttribute('aria-roledescription', 'carousel');
+    if (!this.element.hasAttribute('aria-label') && !this.element.hasAttribute('aria-labelledby')) {
+      this.element.setAttribute('aria-label', 'Media roll');
     }
-
-    // Setup handlers
+    this.liveRegion = this.document.createElement('div');
+    this.liveRegion.className = 'swr-status';
+    this.liveRegion.setAttribute('aria-live', 'polite');
+    this.liveRegion.setAttribute('aria-atomic', 'true');
+    this.element.appendChild(this.liveRegion);
+    if (!this.element.hasAttribute('tabindex')) this.element.setAttribute('tabindex', this.config.enableKeyboard ? '0' : '-1');
     this.setupHandlers();
-
-    // Start autoplay if configured
-    if (this.config.autoplay) {
-      this.autoplayHandler.play();
+    this.boundVisibility = () => this.updateVisibility();
+    this.document.addEventListener('visibilitychange', this.boundVisibility);
+    this.boundMediaPlay = event => {
+      if (event.target.tagName !== 'VIDEO' || event.target.closest('.swr') !== this.element) return;
+      const active = this.roll?.itemElements[this.getCurrentIndex()];
+      if (this.isDestroyed || this.document.hidden || !this.isVisible || !active?.contains(event.target)) this.pauseVideo(event.target);
+    };
+    this.element.addEventListener('play', this.boundMediaPlay, true);
+    if (this.window?.IntersectionObserver) {
+      const bounds = this.element.getBoundingClientRect();
+      this.isVisible = this.element.getClientRects().length > 0 && bounds.bottom > 0 && bounds.right > 0 &&
+        bounds.top < this.window.innerHeight && bounds.left < this.window.innerWidth;
+      this.visibilityObserver = new this.window.IntersectionObserver(entries => {
+        if (this.isDestroyed) return;
+        this.isVisible = entries[entries.length - 1].isIntersecting;
+        this.updateVisibility();
+      });
+      this.visibilityObserver.observe(this.element);
     }
-
+    this.motionQuery?.addEventListener?.('change', this.boundMotion);
+    this.updateAccessibility();
+    if (this.isDestroyed) return;
+    if (this.originalFocus) {
+      const active = this.roll.itemElements[this.getCurrentIndex()];
+      const target = active?.contains(this.originalFocus) || this.originalFocus === this.element ? this.originalFocus : this.element;
+      target.focus({ preventScroll: true });
+      this.originalFocus = null;
+    }
+    if (this.isDestroyed) return;
+    this.updateVisibility();
+    this.element.setAttribute('data-swr-initialized', 'true');
     this.isInitialized = true;
-    this.eventManager.emit('initialized', { totalItems: itemCount });
+    if (this.config.autoplay && this.getTotalItems() > 1) this.autoplayHandler.play();
+    Promise.resolve().then(() => {
+      if (!this.isDestroyed) this.eventManager.emit('initialized', { totalItems: this.getTotalItems() });
+    });
   }
-
-  /**
-   * Setup event handlers
-   * @private
-   */
   setupHandlers() {
-    // Touch/Swipe handler
-    this.touchHandler = new TouchHandler(
-      this.roll.viewport,
-      this.eventManager,
-      this.config,
-      (direction) => this.handleSwipe(direction)
-    );
-    this.touchHandler.enable();
-
-    // Keyboard handler
-    this.keyboardHandler = new KeyboardHandler(
-      this.element,
-      this.eventManager,
-      this.config,
-      (key) => this.handleKeyPress(key)
-    );
-    this.keyboardHandler.enable();
-
-    // Mouse wheel handler (desktop support)
-    this.wheelHandler = new WheelHandler(
-      this.roll.viewport,
-      this.eventManager,
-      this.config,
-      (direction) => this.handleWheel(direction)
-    );
-    this.wheelHandler.enable();
-
-    // Mouse drag handler (desktop drag support)
-    this.mouseDragHandler = new MouseDragHandler(
-      this.roll.viewport,
-      this.eventManager,
-      this.config,
-      (direction) => this.handleMouseDrag(direction)
-    );
-    this.mouseDragHandler.enable();
-
-    // Autoplay handler
-    this.autoplayHandler = new AutoplayHandler(
-      this.eventManager,
-      this.config,
-      () => this.handleAutoplayTick()
-    );
-
-    // Listen for user interactions to pause autoplay
-    if (this.config.enableAutoplayPauseOnInteraction) {
-      this.eventManager.on('swipeDetected', () => {
-        if (this.autoplayHandler.isAutoplayActive() || this.autoplayHandler.isTemporarilyPaused()) {
-          this.autoplayHandler.pauseTemporarily();
-        }
-      });
-
-      this.eventManager.on('keyboardEvent', () => {
-        if (this.autoplayHandler.isAutoplayActive() || this.autoplayHandler.isTemporarilyPaused()) {
-          this.autoplayHandler.pauseTemporarily();
-        }
-      });
-
-      this.eventManager.on('wheelDetected', () => {
-        if (this.autoplayHandler.isAutoplayActive() || this.autoplayHandler.isTemporarilyPaused()) {
-          this.autoplayHandler.pauseTemporarily();
-        }
-      });
-
-      this.eventManager.on('dragDetected', () => {
-        if (this.autoplayHandler.isAutoplayActive() || this.autoplayHandler.isTemporarilyPaused()) {
-          this.autoplayHandler.pauseTemporarily();
-        }
+    this.touchHandler = new TouchHandler(this.roll.viewport, this.eventManager, this.config, direction => this.handleSwipe(direction));
+    this.keyboardHandler = new KeyboardHandler(this.element, this.eventManager, this.config, key => this.handleKeyPress(key));
+    this.wheelHandler = new WheelHandler(this.roll.viewport, this.eventManager, this.config, direction => this.handleWheel(direction));
+    this.mouseDragHandler = new MouseDragHandler(this.roll.viewport, this.eventManager, this.config, direction => this.handleMouseDrag(direction));
+    this.autoplayHandler = new AutoplayHandler(this.eventManager, this.config, () => this.handleAutoplayTick());
+    [this.touchHandler, this.keyboardHandler, this.wheelHandler, this.mouseDragHandler].forEach(handler => handler.enable());
+    for (const event of ['swipeDetected', 'wheelDetected', 'dragDetected', 'keyboardEvent']) {
+      this.eventManager.on(event, data => {
+        if (this.isDestroyed || (event === 'keyboardEvent' && data.key === ' ')) return;
+        if (this.config.enableAutoplayPauseOnInteraction) this.autoplayHandler.pauseTemporarily();
       });
     }
-
-    // Listen for tap events to toggle autoplay
-    this.eventManager.on('tapDetected', () => {
-      console.log('📱 Tap detected - toggling autoplay');
-      if (this.autoplayHandler.isAutoplayActive()) {
-        this.pause();
-      } else {
-        this.play();
-      }
+    this.eventManager.on('tapDetected', () => this.togglePlayback());
+    this.eventManager.on('slideCompleted', () => {
+      if (!this.isDestroyed && this.autoplayHandler.wantsPlayback &&
+        !this.config.loop && this.navigation.isAtEnd()) this.pause();
     });
   }
-
-  /**
-   * Render all items
-   * @private
-   */
+  getRenderer(type) { return this.renderers[type] || null; }
   renderItems() {
-    const items = this.mediaManager.getItems();
-    items.forEach((item, index) => {
-      const renderer = this.getRenderer(item.type);
-      if (renderer) {
-        this.roll.renderItem(index, renderer, item);
-      }
-    });
+    this.mediaManager.getItems().forEach((item, index) => this.roll.renderItem(index, this.getRenderer(item.type), item));
   }
-
-  /**
-   * Get renderer for item type
-   * @private
-   * @param {string} type - Item type (html, video, image)
-   * @returns {Object} Renderer instance
-   */
-  getRenderer(type) {
-    return this.renderers[type] || null;
+  handleSwipe(direction) { if (direction === 'up') this.next(); else if (direction === 'down') this.prev(); }
+  handleMouseDrag(direction) { this.handleSwipe(direction); }
+  handleWheel(direction) { if (direction === 'down') this.next(); else if (direction === 'up') this.prev(); }
+  handleKeyPress(key) { if (key === 'ArrowDown') this.next(); else if (key === 'ArrowUp') this.prev(); else if (key === ' ') this.togglePlayback(); }
+  togglePlayback() {
+    if (this.isDestroyed) return;
+    if (this.autoplayHandler.wantsPlayback) this.pause(); else this.play();
   }
-
-  /**
-   * Handle swipe event
-   * @private
-   */
-  handleSwipe(direction) {
-    console.log('🎬 SWR: Swipe registered -', direction === 'up' ? '⬆️ UP' : '⬇️ DOWN');
-    console.log('📊 Current index:', this.navigation.getCurrentIndex(), 'Total items:', this.mediaManager.getItemCount());
-    
-    if (direction === 'up') {
-      console.log('➡️ Moving to NEXT item');
-      this.next();
-    } else if (direction === 'down') {
-      console.log('⬅️ Moving to PREVIOUS item');
-      this.prev();
-    }
-  }
-
-  /**
-   * Handle keyboard event
-   * @private
-   */
-  handleKeyPress(key) {
-    if (key === 'ArrowDown') {
-      this.next();
-    } else if (key === 'ArrowUp') {
-      this.prev();
-    } else if (key === ' ') {
-      if (this.autoplayHandler.isAutoplayActive()) {
-        this.pause();
-      } else {
-        this.play();
-      }
-    }
-  }
-
-  /**
-   * Handle mouse wheel event
-   * @private
-   */
-  handleWheel(direction) {
-    if (direction === 'down') {
-      this.next();
-    } else if (direction === 'up') {
-      this.prev();
-    }
-  }
-
-  /**
-   * Handle mouse drag event
-   * @private
-   */
-  handleMouseDrag(direction) {
-    console.log('🖱️ SWR: Mouse drag registered -', direction === 'up' ? '⬆️ UP' : '⬇️ DOWN');
-    console.log('📊 Current index:', this.navigation.getCurrentIndex(), 'Total items:', this.mediaManager.getItemCount());
-    
-    if (direction === 'up') {
-      console.log('➡️ Moving to NEXT item (via drag)');
-      this.next();
-    } else if (direction === 'down') {
-      console.log('⬅️ Moving to PREVIOUS item (via drag)');
-      this.prev();
-    }
-  }
-
-  /**
-   * Handle autoplay tick
-   * @private
-   */
   handleAutoplayTick() {
-    this.next();
-  }
-
-  // ========== Public API ==========
-
-  /**
-   * Go to next item
-   */
-  next() {
     if (this.isDestroyed) return;
-
-    const navResult = this.navigation.next();
-    console.log('✨ Navigating to next item - Index:', navResult.index, 'Wrapping:', navResult.isWrapping);
-    this.roll.slideTo(navResult.index, {
-      isWrapping: navResult.isWrapping,
-      direction: navResult.direction
-    });
+    if (this.getTotalItems() < 2 || (!this.config.loop && this.navigation.isAtEnd())) { this.pause(); return; }
+    this.navigate(this.getCurrentIndex() + 1, 'up', false);
   }
-
-  /**
-   * Go to previous item
-   */
-  prev() {
-    if (this.isDestroyed) return;
-
-    const navResult = this.navigation.prev();
-    console.log('✨ Navigating to previous item - Index:', navResult.index, 'Wrapping:', navResult.isWrapping);
-    this.roll.slideTo(navResult.index, {
-      isWrapping: navResult.isWrapping,
-      direction: navResult.direction
-    });
+  next() { this.navigate(this.getCurrentIndex() + 1, 'up'); }
+  prev() { this.navigate(this.getCurrentIndex() - 1, 'down'); }
+  goTo(index) { this.navigate(index); }
+  navigate(index, direction, manual = true) {
+    if (this.isDestroyed || this.isMutating || this.isNavigating || this.roll.isAnimating ||
+      this.getTotalItems() < 2 || !Number.isInteger(index)) return;
+    const count = this.getTotalItems();
+    const oldIndex = this.getCurrentIndex();
+    const isWrapping = !!direction && this.config.loop && (index < 0 || index >= count);
+    const target = isWrapping ? (index < 0 ? count - 1 : 0) : Math.max(0, Math.min(index, count - 1));
+    if (target === oldIndex) return;
+    this.isNavigating = true;
+    try {
+      this.navigation.currentIndex = target;
+      // Query the current preference: WebKit can update a retained MediaQueryList later than a fresh query.
+      const reducedMotion = !!this.window?.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+      this.roll.slideTo(target, { isWrapping, direction, immediate: reducedMotion, silent: true });
+      this.updateAccessibility();
+      if (this.isDestroyed) return;
+      this.syncMedia();
+      if (this.isDestroyed) return;
+      if (manual) this.liveRegion.textContent = 'Slide ' + (target + 1) + ' of ' + count;
+      this.eventManager.emit('navigationChanged', { oldIndex, newIndex: target, totalItems: count });
+      if (!this.isDestroyed) this.eventManager.emit('slideStarted', { index: target });
+    } finally { this.isNavigating = false; }
   }
-
-  /**
-   * Go to specific item by index
-   * @param {number} index - Item index
-   */
-  goTo(index) {
-    if (this.isDestroyed) return;
-
-    const newIndex = this.navigation.goTo(index);
-    this.roll.slideTo(newIndex);
-  }
-
-  /**
-   * Add a new item to the roll
-   * @param {Object} item - Item object
-   * @param {number} index - Optional insertion index
-   */
   addItem(item, index = null) {
-    if (this.isDestroyed) return;
-
-    const success = this.mediaManager.addItem(item, index);
-    if (success) {
-      // Update roll
-      this.roll.updateItemElements();
-      const renderer = this.getRenderer(item.type);
-      const actualIndex = index !== null ? index : this.mediaManager.getItemCount() - 1;
-      this.roll.renderItem(actualIndex, renderer, item);
-
-      // Update navigation
-      this.navigation.initialize(this.mediaManager.getItemCount());
-    }
+    if (this.isDestroyed || this.isMutating || this.isNavigating || !this.mediaManager.validateItem(item)) return;
+    this.isMutating = true;
+    try {
+      this.roll.cancelTransition();
+      const oldIndex = this.getCurrentIndex();
+      const previousCount = this.getTotalItems();
+      const actualIndex = this.mediaManager.resolveInsertionIndex(index);
+      this.mediaManager.addItem(item, actualIndex, false);
+      const element = this.roll.addItemElement(actualIndex);
+      const nextIndex = previousCount && actualIndex <= oldIndex ? oldIndex + 1 : oldIndex;
+      this.navigation.initialize(this.getTotalItems(), nextIndex);
+      this.roll.snapTo(this.getCurrentIndex());
+      this.updateAccessibility();
+      this.eventManager.emit('beforeRender', { index: actualIndex, item });
+      if (this.isDestroyed) return;
+      element.appendChild(this.getRenderer(item.type).render(item));
+      this.syncMedia();
+      if (this.isDestroyed) return;
+      this.eventManager.emit('afterRender', { index: actualIndex, item });
+      if (this.isDestroyed) return;
+      this.eventManager.emit('itemAdded', { item: this.mediaManager.getItem(actualIndex), index: actualIndex });
+      if (!this.isDestroyed && oldIndex !== this.getCurrentIndex()) this.emitNavigation(oldIndex);
+    } finally { this.isMutating = false; }
   }
-
-  /**
-   * Remove an item by index
-   * @param {number} index - Item index
-   */
   removeItem(index) {
-    if (this.isDestroyed) return;
-
-    const item = this.mediaManager.removeItem(index);
-    if (item) {
-      // Update roll
+    if (this.isDestroyed || this.isMutating || this.isNavigating ||
+      !Number.isInteger(index) || index < 0 || index >= this.getTotalItems()) return;
+    this.isMutating = true;
+    try {
+      this.roll.cancelTransition();
+      const oldIndex = this.getCurrentIndex();
+      const element = this.roll.itemElements[index];
+      const shouldFocus = element.contains(this.document.activeElement);
+      element.querySelectorAll('video').forEach(video => {
+        this.pauseVideo(video);
+        if (!this.originalItems.some(entry => entry.element.contains(video))) this.videoAutoplay.delete(video);
+      });
+      const item = this.mediaManager.removeItem(index, false);
+      element.remove();
+      this.slideAttributes.delete(element);
       this.roll.updateItemElements();
-
-      // Update navigation
-      this.navigation.initialize(this.mediaManager.getItemCount());
-
-      // Adjust current index if needed
-      if (index < this.navigation.getCurrentIndex()) {
-        this.navigation.goTo(this.navigation.getCurrentIndex() - 1);
-      }
-    }
+      const target = index < oldIndex ? oldIndex - 1 : oldIndex;
+      this.navigation.initialize(this.getTotalItems(), target);
+      this.roll.snapTo(this.getCurrentIndex());
+      if (shouldFocus) this.element.focus({ preventScroll: true });
+      if (this.isDestroyed) return;
+      this.updateAccessibility();
+      if (this.isDestroyed) return;
+      this.syncMedia();
+      if (this.isDestroyed) return;
+      this.eventManager.emit('itemRemoved', { item, index });
+      if (!this.isDestroyed && (oldIndex !== this.getCurrentIndex() || index === oldIndex)) this.emitNavigation(oldIndex);
+      if (!this.isDestroyed && this.getTotalItems() < 2) this.pause();
+    } finally { this.isMutating = false; }
   }
-
-  /**
-   * Get current item index
-   * @returns {number}
-   */
-  getCurrentIndex() {
-    return this.navigation.getCurrentIndex();
+  emitNavigation(oldIndex) {
+    this.eventManager.emit('navigationChanged', { oldIndex, newIndex: this.getCurrentIndex(), totalItems: this.getTotalItems() });
   }
-
-  /**
-   * Get total number of items
-   * @returns {number}
-   */
-  getTotalItems() {
-    return this.mediaManager.getItemCount();
+  updateAccessibility() {
+    const count = this.getTotalItems();
+    this.roll.itemElements.forEach((element, index) => {
+      if (this.isDestroyed) return;
+      if (!this.slideAttributes.has(element)) this.slideAttributes.set(element, capture(element, SLIDE_ATTRIBUTES));
+      const active = index === this.getCurrentIndex();
+      if (!active && element.contains(this.document.activeElement)) this.element.focus({ preventScroll: true });
+      if (this.isDestroyed) return;
+      if (!element.hasAttribute('role')) element.setAttribute('role', 'group');
+      element.setAttribute('aria-roledescription', 'slide');
+      // Preserve consumer labels; update only the generated positional label.
+      const original = this.slideAttributes.get(element).find(([name]) => name === 'aria-label')[1];
+      if (original === null) element.setAttribute('aria-label', (index + 1) + ' of ' + count);
+      element.setAttribute('aria-hidden', String(!active));
+      element.toggleAttribute('inert', !active);
+    });
   }
-
-  /**
-   * Start autoplay
-   */
-  play() {
+  updateVisibility() {
     if (this.isDestroyed) return;
-
-    if (!this.autoplayHandler) return;
-
-    this.autoplayHandler.play();
+    const hidden = this.document.hidden || !this.isVisible;
+    this.autoplayHandler.setSuspended('visibility', hidden);
+    this.syncMedia();
   }
-
-  /**
-   * Pause autoplay
-   */
-  pause() {
+  pauseVideo(video) {
+    try { video.pause(); } catch { /* Detached/unsupported media still permits cleanup. */ }
+  }
+  syncMedia() {
     if (this.isDestroyed) return;
-
-    if (!this.autoplayHandler) return;
-
-    this.autoplayHandler.pause();
+    const generation = ++this.mediaGeneration;
+    const activeElement = this.roll.itemElements[this.getCurrentIndex()];
+    const hidden = this.document.hidden || !this.isVisible;
+    this.roll.itemElements.forEach((element, index) => {
+      if (this.isDestroyed) return;
+      element.querySelectorAll('video').forEach(video => {
+        if (this.isDestroyed) return;
+        if (video.closest('.swr') !== this.element) return;
+        if (!this.videoAutoplay.has(video)) {
+          this.videoAutoplay.set(video, video.hasAttribute('autoplay'));
+          video.removeAttribute('autoplay');
+        }
+        const item = this.mediaManager.getItem(index);
+        const requestsAutoplay = item?.type === 'video' ? item.autoplay : this.videoAutoplay.get(video);
+        if (hidden || element !== activeElement) { this.pauseVideo(video); return; }
+        if (!requestsAutoplay || !video.paused) return;
+        try {
+          const result = video.play();
+          result?.then?.(() => {
+            if (this.isDestroyed || generation !== this.mediaGeneration) {
+              const current = this.roll?.itemElements[this.getCurrentIndex()];
+              if (this.isDestroyed || this.document.hidden || !this.isVisible || !current?.contains(video)) this.pauseVideo(video);
+            }
+          }, error => {
+            if (!this.isDestroyed && generation === this.mediaGeneration) {
+              this.eventManager.emit('mediaPlaybackError', { index, error });
+            }
+          });
+        } catch (error) { this.eventManager.emit('mediaPlaybackError', { index, error }); }
+      });
+    });
   }
-
-  /**
-   * Check if autoplay is active
-   * @returns {boolean}
-   */
-  isPlaying() {
-    if (!this.autoplayHandler) return false;
-
-    return this.autoplayHandler.isAutoplayActive();
-  }
-
-  /**
-   * Subscribe to event
-   * @param {string} event - Event name
-   * @param {Function} callback - Callback function
-   * @returns {Function} Unsubscribe function
-   */
-  on(event, callback) {
-    return this.eventManager.on(event, callback);
-  }
-
-  /**
-   * Unsubscribe from event
-   * @param {string} event - Event name
-   * @param {Function} callback - Callback function
-   */
-  off(event, callback) {
-    this.eventManager.off(event, callback);
-  }
-
-  /**
-   * Get current configuration
-   * @returns {Object}
-   */
-  getConfig() {
-    return { ...this.config };
-  }
-
-  /**
-   * Destroy the SWR instance
-   */
+  getCurrentIndex() { return this.navigation?.getCurrentIndex() ?? 0; }
+  getTotalItems() { return this.mediaManager?.getItemCount() ?? 0; }
+  play() { if (!this.isDestroyed && this.getTotalItems() > 1) this.autoplayHandler.play(); }
+  pause() { if (!this.isDestroyed) this.autoplayHandler.pause(); }
+  isPlaying() { return !!this.autoplayHandler?.isAutoplayActive(); }
+  on(event, callback) { return this.isDestroyed ? () => {} : this.eventManager.on(event, callback); }
+  off(event, callback) { this.eventManager?.off(event, callback); }
+  getConfig() { return { ...this.config, items: this.config.items.map(item => item && typeof item === 'object' ? { ...item } : item) }; }
   destroy() {
     if (this.isDestroyed) return;
-
+    const focusedNode = this.element.contains(this.document.activeElement) ? this.document.activeElement : null;
     this.isDestroyed = true;
-
-    // Stop autoplay
-    if (this.autoplayHandler) {
-      this.autoplayHandler.destroy();
-      this.autoplayHandler = null;
+    ++this.mediaGeneration;
+    this.document.removeEventListener('visibilitychange', this.boundVisibility);
+    this.element.removeEventListener('play', this.boundMediaPlay, true);
+    this.visibilityObserver?.disconnect();
+    this.motionQuery?.removeEventListener?.('change', this.boundMotion);
+    for (const key of ['touchHandler', 'keyboardHandler', 'wheelHandler', 'mouseDragHandler', 'autoplayHandler']) {
+      this[key]?.destroy();
+      this[key] = null;
     }
-
-    // Destroy handlers
-    if (this.touchHandler) {
-      this.touchHandler.destroy();
-      this.touchHandler = null;
-    }
-
-    if (this.keyboardHandler) {
-      this.keyboardHandler.destroy();
-      this.keyboardHandler = null;
-    }
-
-    if (this.wheelHandler) {
-      this.wheelHandler.destroy();
-      this.wheelHandler = null;
-    }
-
-    if (this.mouseDragHandler) {
-      this.mouseDragHandler.destroy();
-      this.mouseDragHandler = null;
-    }
-
-    // Destroy roll
-    if (this.roll) {
-      this.roll.destroy();
-      this.roll = null;
-    }
-
-    // Clear managers
-    if (this.mediaManager) {
-      this.mediaManager.clear();
-      this.mediaManager = null;
-    }
-
-    if (this.navigation) {
-      this.navigation = null;
-    }
-
-    // Clear event listeners
-    if (this.eventManager) {
-      this.eventManager.clear();
-      this.eventManager = null;
-    }
-
-    // Emit destroy event
-    this.eventManager?.emit('destroy');
-
+    this.videoAutoplay.forEach((autoplay, video) => {
+      this.pauseVideo(video);
+      if (autoplay) video.setAttribute('autoplay', '');
+    });
+    this.roll?.destroy();
+    this.slideAttributes.forEach((attributes, element) => restore(element, attributes));
+    // Reverse order restores saved nextSibling anchors before preceding nodes.
+    [...this.originalItems].reverse().forEach(entry => {
+      entry.parent.insertBefore(entry.element, entry.next?.parentNode === entry.parent ? entry.next : null);
+      restore(entry.element, entry.attributes);
+    });
+    this.element.replaceChildren(...this.originalChildren);
+    restore(this.element, this.originalAttributes);
+    if (this.element[INSTANCE] === this) delete this.element[INSTANCE];
+    this.mediaManager.clear(false);
+    this.mediaManager = null;
+    this.navigation = null;
+    this.roll = null;
     this.isInitialized = false;
+    this.eventManager.emit('itemsCleared');
+    this.eventManager.emit('destroy');
+    this.eventManager.clear();
+    this.slideAttributes.clear();
+    this.videoAutoplay.clear();
+    this.originalChildren = [];
+    this.originalItems = [];
+    this.originalFocus = null;
+    if (focusedNode && this.element.contains(focusedNode) &&
+      (this.document.activeElement === this.document.body || this.element.contains(this.document.activeElement))) {
+      focusedNode.focus({ preventScroll: true });
+    }
   }
 }
-
-// ES6 export (webpack will handle UMD conversion)
 export default SWR;

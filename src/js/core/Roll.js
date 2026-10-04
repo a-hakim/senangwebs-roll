@@ -1,316 +1,124 @@
-/**
- * Roll - Core roll logic (positioning, animations)
- */
+/** Owns slide DOM and cancellable transitions; never clones consumer nodes. */
 class Roll {
   constructor(element, eventManager, config) {
-    this.element = element;
-    this.eventManager = eventManager;
-    this.config = config;
-    this.currentIndex = 0;
-    this.container = null;
-    this.viewport = null;
-    this.itemElements = [];
-    this.isAnimating = false;
-    this.transitionId = null;
+    Object.assign(this, { element, eventManager, config, currentIndex: 0,
+      container: null, viewport: null, itemElements: [], isAnimating: false,
+      transitionId: null, generation: 0, wrapItem: null, wrapTransform: null });
   }
-
-  /**
-   * Initialize roll DOM structure
-   */
-  initialize() {
-    this.setupDOM();
+  initialize(elements = []) {
+    const doc = this.element.ownerDocument;
+    this.viewport = doc.createElement('div');
+    this.viewport.className = 'swr-viewport';
+    this.container = doc.createElement('div');
+    this.container.className = 'swr-container';
+    elements.forEach(item => this.container.appendChild(item));
+    this.viewport.appendChild(this.container);
+    this.element.replaceChildren(this.viewport);
+    this.element.classList.add('swr');
+    this.updateItemElements();
     this.setupStyles();
   }
-
-  /**
-   * Setup roll DOM structure
-   */
-  setupDOM() {
-    // Create viewport container
-    this.viewport = document.createElement('div');
-    this.viewport.className = 'swr-viewport';
-
-    // Create scrollable container
-    this.container = document.createElement('div');
-    this.container.className = 'swr-container';
-
-    // Move existing items to container
-    const existingItems = this.element.querySelectorAll('[data-swr-item]');
-    existingItems.forEach((item) => {
-      this.container.appendChild(item.cloneNode(true));
-    });
-
-    this.viewport.appendChild(this.container);
-    this.element.innerHTML = '';
-    this.element.appendChild(this.viewport);
-
-    // Add SWR class to main element
-    this.element.classList.add('swr');
-
-    // Update item elements reference
-    this.updateItemElements();
-  }
-
-  /**
-   * Setup initial styles
-   */
   setupStyles() {
-    // Let CSS handle the responsive aspect ratio (16:9 desktop, 9:16 mobile)
-    // Only apply inline if it strictly differs from the CSS default or is custom mapped.
-    // For now, we rely on the CSS, but we can set a CSS variable if needed in the future.
-    this.viewport.style.position = 'relative';
-    this.viewport.style.width = '100%';
-    // Always apply the configured aspect ratio as an inline style so it takes
-    // priority over the CSS media-query defaults (which switch between 9:16 and 16:9).
     const [width, height] = this.config.aspectRatio.split(':').map(Number);
-    this.viewport.style.aspectRatio = `${width} / ${height}`;
-    this.viewport.style.overflow = 'hidden';
-
-    // Setup container for vertical scrolling (Instagram Reels style)
-    this.container.style.position = 'absolute';
-    this.container.style.top = '0';
-    this.container.style.left = '0';
-    this.container.style.width = '100%';
-    this.container.style.height = '100%';
-    this.container.style.display = 'flex';
-    this.container.style.flexDirection = 'column';
-    this.container.style.transition = `transform ${this.config.transitionDuration}ms ease-in-out`;
-    this.container.style.transform = 'translateY(0)';
+    Object.assign(this.viewport.style, { position: 'relative', width: '100%',
+      aspectRatio: width + ' / ' + height, overflow: 'hidden' });
+    Object.assign(this.container.style, { position: 'absolute', top: '0', left: '0',
+      width: '100%', height: '100%', display: 'flex', flexDirection: 'column',
+      transition: 'transform ' + this.config.transitionDuration + 'ms ease-in-out',
+      transform: 'translateY(0%)' });
   }
-
-  /**
-   * Parse aspect ratio string to numeric value
-   * @param {string} ratio - Aspect ratio (e.g., "9:16")
-   * @returns {number}
-   */
   parseAspectRatio(ratio) {
     const [width, height] = ratio.split(':').map(Number);
     return width / height;
   }
-
-  /**
-   * Update item elements reference
-   */
   updateItemElements() {
-    this.itemElements = Array.from(
-      this.container.querySelectorAll('[data-swr-item]')
-    );
+    this.itemElements = this.container ? Array.from(this.container.children).filter(item => item.hasAttribute('data-swr-item')) : [];
   }
-
-  /**
-   * Add item element to container
-   * @param {number} index - Optional index to insert at
-   * @returns {HTMLElement} Created item element
-   */
   addItemElement(index = null) {
-    const itemElement = document.createElement('div');
-    itemElement.setAttribute('data-swr-item', '');
-    itemElement.style.flex = '0 0 100%';
-    itemElement.style.width = '100%';
-    itemElement.style.height = '100%';
-    itemElement.style.overflow = 'hidden';
-
-    if (index !== null && index >= 0 && index < this.container.children.length) {
-      this.container.insertBefore(itemElement, this.container.children[index]);
-    } else {
-      this.container.appendChild(itemElement);
-    }
-
+    const element = this.element.ownerDocument.createElement('div');
+    element.setAttribute('data-swr-item', '');
+    if (Number.isInteger(index) && index >= 0 && index < this.itemElements.length) {
+      this.container.insertBefore(element, this.itemElements[index]);
+    } else this.container.appendChild(element);
     this.updateItemElements();
-    return itemElement;
+    return element;
   }
-
-  /**
-   * Render item at index
-   * @param {number} index - Item index
-   * @param {Object} renderer - Renderer instance
-   * @param {Object} item - Item data
-   */
   renderItem(index, renderer, item) {
-    // Create item elements until we have enough
-    while (index >= this.itemElements.length) {
-      this.addItemElement();
-    }
-
-    if (index < 0 || index >= this.itemElements.length) {
-      console.warn('Invalid item index:', index);
-      return;
-    }
-
-    this.eventManager.emit('beforeRender', { index, item });
-
+    if (!Number.isInteger(index) || index < 0 || !renderer || !this.container) return;
+    while (index >= this.itemElements.length) this.addItemElement();
     const element = this.itemElements[index];
-    element.innerHTML = '';
-    element.appendChild(renderer.render(item));
-
+    this.eventManager.emit('beforeRender', { index, item });
+    if (!this.container) return;
+    element.replaceChildren(renderer.render(item));
     this.eventManager.emit('afterRender', { index, item });
   }
-
-  /**
-   * Slide to item at index
-   * @param {number} targetIndex - Target item index
-   * @param {Object} options - Animation options
-   * @param {boolean} options.isWrapping - Whether this is a wrap-around navigation
-   * @param {string} options.direction - Direction of animation ('up' or 'down')
-   */
-  slideTo(targetIndex, options = {}) {
-    if (targetIndex < 0 || targetIndex >= this.itemElements.length) {
-      console.warn('Invalid slide index:', targetIndex);
-      return;
-    }
-
-    if (this.isAnimating) {
-      console.log('⏳ Animation in progress, ignoring slide request');
-      return;
-    }
-
-    // Bug Fix 1: Skip animation if sliding to the same edge item and we are not wrapping
-    if (targetIndex === this.currentIndex && !options.isWrapping) {
-      console.log('🛑 Already at boundary edge, ignoring slide request to same index');
-      return;
-    }
-
+  slideTo(index, options = {}) {
+    if (!this.container || this.isAnimating || !Number.isInteger(index) ||
+      index < 0 || index >= this.itemElements.length || index === this.currentIndex) return false;
+    const fromIndex = this.currentIndex;
+    this.currentIndex = index;
     this.isAnimating = true;
-    const previousIndex = this.currentIndex;
-    this.currentIndex = targetIndex;
-
-    // Handle wrap-around animation for seamless looping
-    if (options.isWrapping && this.itemElements.length > 1) {
-      this.handleWrapAnimation(previousIndex, targetIndex, options.direction);
-    } else {
-      // Normal slide animation
-      const offset = -targetIndex * 100;
-      this.container.style.transform = `translateY(${offset}%)`;
-      console.log('🎬 Sliding to item', targetIndex, '- Transform: translateY(' + offset + '%)');
-    }
-
-    // Emit slide event
-    this.eventManager.emit('slideStarted', { index: targetIndex });
-
-    // Clear previous timeout
-    if (this.transitionId) clearTimeout(this.transitionId);
-
-    // Wait for transition to complete
-    this.transitionId = setTimeout(() => {
+    const generation = ++this.generation;
+    const duration = options.immediate ? 0 : this.config.transitionDuration;
+    this.container.style.transition = duration ? 'transform ' + duration + 'ms ease-in-out' : 'none';
+    if (duration && options.isWrapping && this.itemElements.length > 1) {
+      this.handleWrapAnimation(fromIndex, index, options.direction);
+    } else this.container.style.transform = 'translateY(' + (-index * 100) + '%)';
+    const complete = () => {
+      if (!this.container || generation !== this.generation) return;
+      this.transitionId = null;
+      this.resetWrap();
+      this.snapTo(this.currentIndex);
       this.isAnimating = false;
-      console.log('✅ Slide animation completed for item', targetIndex);
-      this.eventManager.emit('slideCompleted', { index: targetIndex });
-    }, this.config.transitionDuration);
+      this.eventManager.emit('slideCompleted', { index: this.currentIndex });
+    };
+    if (duration) this.transitionId = setTimeout(complete, duration);
+    else Promise.resolve().then(complete);
+    if (!options.silent) this.eventManager.emit('slideStarted', { index });
+    return true;
   }
-
-  /**
-   * Handle wrap-around animation for seamless infinite scrolling
-   * @private
-   * @param {number} fromIndex - Starting index
-   * @param {number} toIndex - Target index
-   * @param {string} direction - Animation direction ('up' or 'down')
-   */
   handleWrapAnimation(fromIndex, toIndex, direction) {
-    const totalItems = this.itemElements.length;
-    
-    // Wrapping from last to first (user swiped up on last item)
-    if (fromIndex === totalItems - 1 && toIndex === 0 && direction === 'up') {
-      console.log('🔄 Wrap animation: last → first (animating UP)');
-      
-      const firstItem = this.itemElements[0];
-      
-      // Temporarily move the first item physically *below* the last item
-      // so the container animation over it looks perfectly continuous instead of showing blank space.
-      const shiftAmount = totalItems * 100;
-      firstItem.style.transform = `translateY(${shiftAmount}%)`;
-      
-      // Animate container to this artificial position (one past the last item)
-      const animateOffset = -shiftAmount;
-      this.container.style.transform = `translateY(${animateOffset}%)`;
-      
-      // After animation completes, snap everything back to true 0 state invisibly
-      setTimeout(() => {
-        // Disable transition for instantaneous snap
-        this.container.style.transition = 'none';
-        
-        // Remove individual element transform
-        firstItem.style.transform = '';
-        
-        // Snap container to true 0 position
-        this.container.style.transform = `translateY(0%)`;
-        
-        // Force reflow
-        this.container.offsetHeight;
-        
-        // Re-enable transition for future slides
-        this.container.style.transition = `transform ${this.config.transitionDuration}ms ease-in-out`;
-      }, this.config.transitionDuration);
-    }
-    // Wrapping from first to last (user swiped down on first item)
-    else if (fromIndex === 0 && toIndex === totalItems - 1 && direction === 'down') {
-      console.log('🔄 Wrap animation: first → last (animating DOWN)');
-      
-      const lastItem = this.itemElements[totalItems - 1];
-      
-      // Temporarily move the last item physically *above* the first item.
-      // The last item naturally sits at (totalItems-1)*100% in the flex column.
-      // We shift it up by totalItems*100% so it lands at -100% (one slot above item 0).
-      const shiftAmount = -totalItems * 100;
-      lastItem.style.transform = `translateY(${shiftAmount}%)`;
-      
-      // Animate container down by exactly one viewport height to reveal the repositioned last item.
-      // Container is currently at translateY(0%). Moving to translateY(100%) shifts the viewport
-      // up to show the -100% to 0% range, which is exactly where the last item now sits.
-      this.container.style.transform = `translateY(100%)`;
-      
-      // After animation completes, snap everything back to accurate final state invisibly
-      setTimeout(() => {
-        this.container.style.transition = 'none';
-        
-        // Remove individual element transform
-        lastItem.style.transform = '';
-        
-        // Snap container to true last item position
-        const finalOffset = -(totalItems - 1) * 100;
-        this.container.style.transform = `translateY(${finalOffset}%)`;
-        
-        // Force reflow
-        this.container.offsetHeight;
-        
-        // Re-enable transition
-        this.container.style.transition = `transform ${this.config.transitionDuration}ms ease-in-out`;
-      }, this.config.transitionDuration);
-    }
-    // Fallback to normal animation if conditions don't match
-    else {
-      const offset = -toIndex * 100;
-      this.container.style.transform = `translateY(${offset}%)`;
-      console.log('🎬 Sliding to item', toIndex, '- Transform: translateY(' + offset + '%)');
-    }
+    const total = this.itemElements.length;
+    if (fromIndex === total - 1 && toIndex === 0 && direction === 'up') {
+      this.wrapItem = this.itemElements[0];
+      this.wrapTransform = this.wrapItem.style.transform;
+      this.wrapItem.style.transform = 'translateY(' + total * 100 + '%)';
+      this.container.style.transform = 'translateY(' + (-total * 100) + '%)';
+    } else if (fromIndex === 0 && toIndex === total - 1 && direction === 'down') {
+      this.wrapItem = this.itemElements[total - 1];
+      this.wrapTransform = this.wrapItem.style.transform;
+      this.wrapItem.style.transform = 'translateY(' + (-total * 100) + '%)';
+      this.container.style.transform = 'translateY(100%)';
+    } else this.container.style.transform = 'translateY(' + (-toIndex * 100) + '%)';
   }
-
-  /**
-   * Get number of item elements
-   * @returns {number}
-   */
-  getItemCount() {
-    return this.itemElements.length;
+  resetWrap() {
+    if (this.wrapItem) this.wrapItem.style.transform = this.wrapTransform;
+    this.wrapItem = null;
+    this.wrapTransform = null;
   }
-
-  /**
-   * Get current slide index
-   * @returns {number}
-   */
-  getCurrentIndex() {
-    return this.currentIndex;
+  snapTo(index) {
+    if (!this.container) return;
+    this.currentIndex = index;
+    this.container.style.transition = 'none';
+    this.container.style.transform = 'translateY(' + (-index * 100) + '%)';
+    void this.container.offsetHeight;
+    this.container.style.transition = 'transform ' + this.config.transitionDuration + 'ms ease-in-out';
   }
-
-  /**
-   * Destroy roll
-   */
+  cancelTransition() {
+    ++this.generation;
+    if (this.transitionId !== null) clearTimeout(this.transitionId);
+    this.transitionId = null;
+    this.resetWrap();
+    this.snapTo(this.currentIndex);
+    this.isAnimating = false;
+  }
+  getItemCount() { return this.itemElements.length; }
+  getCurrentIndex() { return this.currentIndex; }
   destroy() {
-    if (this.transitionId) clearTimeout(this.transitionId);
+    this.cancelTransition();
     this.container = null;
     this.viewport = null;
     this.itemElements = [];
   }
 }
-
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = Roll;
-}
+module.exports = Roll;

@@ -13,19 +13,15 @@ class MediaManager {
    * @param {number} index - Optional index to insert at
    * @returns {boolean} Success status
    */
-  addItem(item, index = null) {
+  addItem(item, index = null, emit = true) {
     if (!this.validateItem(item)) {
       console.warn('Invalid item:', item);
       return false;
     }
 
-    if (index !== null && index >= 0 && index <= this.items.length) {
-      this.items.splice(index, 0, item);
-    } else {
-      this.items.push(item);
-    }
-
-    this.eventManager.emit('itemAdded', { item, index: this.items.indexOf(item) });
+    const actualIndex = this.resolveInsertionIndex(index);
+    this.items.splice(actualIndex, 0, { ...item });
+    if (emit) this.eventManager.emit('itemAdded', { item: this.items[actualIndex], index: actualIndex });
     return true;
   }
 
@@ -34,14 +30,14 @@ class MediaManager {
    * @param {number} index - Index of item to remove
    * @returns {Object|null} Removed item or null if invalid index
    */
-  removeItem(index) {
-    if (index < 0 || index >= this.items.length) {
+  removeItem(index, emit = true) {
+    if (!Number.isInteger(index) || index < 0 || index >= this.items.length) {
       console.warn('Invalid item index:', index);
       return null;
     }
 
     const removed = this.items.splice(index, 1)[0];
-    this.eventManager.emit('itemRemoved', { item: removed, index });
+    if (emit) this.eventManager.emit('itemRemoved', { item: removed, index });
     return removed;
   }
 
@@ -51,7 +47,7 @@ class MediaManager {
    * @returns {Object|null} Item or null if invalid index
    */
   getItem(index) {
-    if (index < 0 || index >= this.items.length) {
+    if (!Number.isInteger(index) || index < 0 || index >= this.items.length) {
       return null;
     }
     return this.items[index];
@@ -80,12 +76,14 @@ class MediaManager {
    * @returns {boolean} Success status
    */
   updateItem(index, updates) {
-    if (index < 0 || index >= this.items.length) {
+    if (!Number.isInteger(index) || index < 0 || index >= this.items.length) {
       console.warn('Invalid item index:', index);
       return false;
     }
 
-    this.items[index] = { ...this.items[index], ...updates };
+    const item = { ...this.items[index], ...updates };
+    if (!this.validateItem(item)) return false;
+    this.items[index] = item;
     this.eventManager.emit('itemUpdated', { item: this.items[index], index });
     return true;
   }
@@ -93,9 +91,13 @@ class MediaManager {
   /**
    * Clear all items
    */
-  clear() {
+  clear(emit = true) {
     this.items = [];
-    this.eventManager.emit('itemsCleared');
+    if (emit) this.eventManager.emit('itemsCleared');
+  }
+
+  resolveInsertionIndex(index) {
+    return Number.isInteger(index) && index >= 0 && index <= this.items.length ? index : this.items.length;
   }
 
   /**
@@ -110,21 +112,28 @@ class MediaManager {
 
     const { type } = item;
 
+    for (const key of ['mimeType', 'alt', 'title']) {
+      if (item[key] !== undefined && typeof item[key] !== 'string') return false;
+    }
+    for (const key of ['autoplay', 'muted', 'playsinline', 'loop', 'controls']) {
+      if (item[key] !== undefined && typeof item[key] !== 'boolean') return false;
+    }
+
     if (!type) {
       console.warn('Item missing "type" property');
       return false;
     }
 
     if (type === 'video') {
-      return item.src !== undefined && item.src !== '';
+      return typeof item.src === 'string' && item.src.trim() !== '';
     }
 
     if (type === 'image') {
-      return item.src !== undefined && item.src !== '';
+      return typeof item.src === 'string' && item.src.trim() !== '';
     }
 
     if (type === 'html') {
-      return item.content !== undefined;
+      return typeof item.content === 'string';
     }
 
     console.warn(`Unknown item type: ${type}`);

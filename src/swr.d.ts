@@ -2,6 +2,8 @@ export as namespace SWR;
 
 declare class SWR {
   constructor(selector: string | HTMLElement, config?: SWR.Config);
+  static getInstance(selector: string | HTMLElement): SWR | null;
+  static initAll(root?: ParentNode): SWR[];
 
   next(): void;
   prev(): void;
@@ -16,6 +18,7 @@ declare class SWR {
   pause(): void;
   isPlaying(): boolean;
 
+  on(event: 'mediaPlaybackError', callback: SWR.EventCallback<{ index: number; error: unknown }>): () => void;
   on(event: string, callback: SWR.EventCallback): () => void;
   off(event: string, callback: SWR.EventCallback): void;
   getConfig(): SWR.ResolvedConfig;

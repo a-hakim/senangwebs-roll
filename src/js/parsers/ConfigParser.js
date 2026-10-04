@@ -1,120 +1,44 @@
-/**
- * ConfigParser - Validates, merges, and provides default configuration
- */
+/** Resolve configuration once, before any component captures it. */
 class ConfigParser {
-  /**
-   * Default configuration for SWR
-   */
   static DEFAULT_CONFIG = {
-    aspectRatio: '9:16',
-    loop: false,
-    autoplay: false,
-    autoplayInterval: 5000,
-    enableKeyboard: true,
-    enableTouch: true,
-    enableWheel: true,
-    enableMouseDrag: true,
-    enableAutoplayPauseOnInteraction: true,
-    autoplayResumeDelay: 3000,
-    transitionDuration: 350,
-    swipeThreshold: 50,
-    items: [],
+    aspectRatio: '9:16', loop: false, autoplay: false, autoplayInterval: 5000,
+    enableKeyboard: true, enableTouch: true, enableWheel: true, enableMouseDrag: true,
+    enableAutoplayPauseOnInteraction: true, autoplayResumeDelay: 3000,
+    transitionDuration: 350, swipeThreshold: 50, items: [],
   };
-
-  /**
-   * Parse and validate configuration
-   * @param {Object} userConfig - User provided configuration
-   * @returns {Object} Merged and validated configuration
-   */
   static parse(userConfig = {}) {
+    const input = userConfig && typeof userConfig === 'object' && !Array.isArray(userConfig) ? userConfig : {};
     const config = { ...this.DEFAULT_CONFIG };
-
-    if (typeof userConfig !== 'object' || userConfig === null) {
-      console.warn('Invalid config provided, using defaults');
-      return config;
-    }
-
-    // Merge user config with defaults
-    Object.keys(userConfig).forEach((key) => {
-      if (key in config) {
-        config[key] = userConfig[key];
-      } else {
-        console.warn(`Unknown config option: ${key}`);
-      }
+    Object.keys(config).forEach(key => {
+      if (Object.prototype.hasOwnProperty.call(input, key)) config[key] = input[key];
     });
-
-    // If autoplay is enabled but loop is not explicitly set, enable loop automatically
-    // This ensures autoplay works continuously without stopping at the last item
-    if (config.autoplay && userConfig.loop === undefined) {
-      config.loop = true;
-      console.log('🔄 Auto-enabling loop for autoplay');
-    }
-
     this.validate(config);
+    if (config.autoplay && input.loop === undefined) config.loop = true;
+    config.items = Array.isArray(config.items) ? config.items.map(item => (
+      item && typeof item === 'object' ? { ...item } : item
+    )) : [];
     return config;
   }
-
-  /**
-   * Validate configuration values
-   * @param {Object} config - Configuration to validate
-   * @throws {Error} If validation fails
-   */
   static validate(config) {
-    // Validate aspectRatio format (e.g., "9:16")
-    if (typeof config.aspectRatio !== 'string' || !this.isValidAspectRatio(config.aspectRatio)) {
-      console.warn(`Invalid aspectRatio: ${config.aspectRatio}, using default`);
-      config.aspectRatio = this.DEFAULT_CONFIG.aspectRatio;
+    if (!this.isValidAspectRatio(config.aspectRatio)) config.aspectRatio = this.DEFAULT_CONFIG.aspectRatio;
+    for (const key of ['loop', 'autoplay', 'enableKeyboard', 'enableTouch', 'enableWheel',
+      'enableMouseDrag', 'enableAutoplayPauseOnInteraction']) {
+      if (typeof config[key] !== 'boolean') config[key] = this.DEFAULT_CONFIG[key];
     }
-
-    // Validate boolean values
-    if (typeof config.loop !== 'boolean') config.loop = this.DEFAULT_CONFIG.loop;
-    if (typeof config.autoplay !== 'boolean') config.autoplay = this.DEFAULT_CONFIG.autoplay;
-    if (typeof config.enableKeyboard !== 'boolean') config.enableKeyboard = this.DEFAULT_CONFIG.enableKeyboard;
-    if (typeof config.enableTouch !== 'boolean') config.enableTouch = this.DEFAULT_CONFIG.enableTouch;
-    if (typeof config.enableWheel !== 'boolean') config.enableWheel = this.DEFAULT_CONFIG.enableWheel;
-    if (typeof config.enableAutoplayPauseOnInteraction !== 'boolean') {
-      config.enableAutoplayPauseOnInteraction = this.DEFAULT_CONFIG.enableAutoplayPauseOnInteraction;
-    }
-
-    // Validate numeric values
-    if (typeof config.autoplayInterval !== 'number' || config.autoplayInterval < 1000) {
-      config.autoplayInterval = this.DEFAULT_CONFIG.autoplayInterval;
-    }
-
-    if (typeof config.autoplayResumeDelay !== 'number' || config.autoplayResumeDelay < 0) {
-      config.autoplayResumeDelay = this.DEFAULT_CONFIG.autoplayResumeDelay;
-    }
-
-    if (typeof config.transitionDuration !== 'number' || config.transitionDuration < 0) {
-      config.transitionDuration = this.DEFAULT_CONFIG.transitionDuration;
-    }
-
-    if (typeof config.swipeThreshold !== 'number' || config.swipeThreshold < 1) {
-      config.swipeThreshold = this.DEFAULT_CONFIG.swipeThreshold;
+    for (const [key, minimum] of Object.entries({ autoplayInterval: 1000,
+      autoplayResumeDelay: 0, transitionDuration: 0, swipeThreshold: 1 })) {
+      if (!Number.isFinite(config[key]) || config[key] < minimum || config[key] > 2147483647) {
+        config[key] = this.DEFAULT_CONFIG[key];
+      }
     }
   }
-
-  /**
-   * Check if aspect ratio string is valid
-   * @param {string} ratio - Aspect ratio string (e.g., "9:16")
-   * @returns {boolean}
-   */
   static isValidAspectRatio(ratio) {
-    const match = ratio.match(/^(\d+):(\d+)$/);
-    return match !== null && parseInt(match[1]) > 0 && parseInt(match[2]) > 0;
+    if (typeof ratio !== 'string' || !/^\d+:\d+$/.test(ratio)) return false;
+    return ratio.split(':').every(value => Number.isFinite(Number(value)) && Number(value) > 0);
   }
-
-  /**
-   * Parse aspect ratio string to numeric value
-   * @param {string} ratio - Aspect ratio string (e.g., "9:16")
-   * @returns {number} Numeric ratio value (width / height)
-   */
   static parseAspectRatio(ratio) {
     const [width, height] = ratio.split(':').map(Number);
     return width / height;
   }
 }
-
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = ConfigParser;
-}
+module.exports = ConfigParser;

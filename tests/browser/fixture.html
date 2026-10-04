@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="/dist/swr.min.css">
+<style>body { margin: 12px; } .roll { width: 180px; display: inline-block; vertical-align: top; }
+.surface { height: 100%; width: 100%; background: #ddd; display: flex; flex-direction: column; justify-content: center; }
+button, input, a { margin: 8px; } #outside { display: block; }</style></head>
+<body>
+<div id="first" class="roll" data-swr data-swr-transition="30" data-swr-loop="true" aria-label="First roll">
+ <div data-swr-item><div class="surface"><button id="action">Action</button><input id="editor" aria-label="Editor"><a id="link" href="#destination">Link</a></div></div>
+ <div data-swr-item><div class="surface">Second slide</div></div>
+ <div data-swr-item><div class="surface">Third slide</div></div>
+</div>
+<div id="second" class="roll" data-swr data-swr-transition="30" aria-label="Second roll">
+ <div data-swr-item><div class="surface">Other first</div></div>
+ <div data-swr-item><div class="surface">Other second</div></div>
+</div>
+<input id="outside" aria-label="Outside"><p id="destination">Destination</p>
+<script src="/dist/swr.min.js"></script>
+<script>window.actionCount = 0; document.querySelector('#action').addEventListener('click', () => window.actionCount++);</script>
+</body></html>

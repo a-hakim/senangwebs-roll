@@ -1,4 +1,4 @@
-export as namespace SWR;
+
 
 declare class SWR {
   constructor(selector: string | HTMLElement, config?: SWR.Config);
@@ -87,4 +87,5 @@ declare namespace SWR {
   type Item = VideoItem | ImageItem | HTMLItem;
 }
 
-export = SWR;
+export default SWR;
+export { SWR };

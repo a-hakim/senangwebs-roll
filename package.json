@@ -1,16 +1,23 @@
 {
   "name": "senangwebs-roll",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "description": "A lightweight, responsive roll library for creating mobile-like media rolls (Instagram Reels/YouTube Shorts style)",
   "main": "dist/swr.js",
   "types": "dist/swr.d.ts",
   "scripts": {
-    "dev": "webpack serve --mode development",
-    "build": "webpack --mode production",
+    "dev": "node scripts/dev.cjs",
+    "build": "node scripts/clean.js && webpack --mode production",
     "build:dev": "webpack --mode development",
     "watch": "webpack --watch --mode development",
-    "serve": "webpack serve --mode development",
-    "clean": "rimraf dist"
+    "serve": "node scripts/dev.cjs",
+    "clean": "node scripts/clean.js",
+    "test:unit": "node --test tests/unit/*.test.cjs",
+    "test:browser": "playwright test",
+    "test:types": "tsc -p tests/types/tsconfig.json",
+    "verify:package": "node scripts/verify-package.cjs",
+    "prepack": "npm run build && npm run verify:package",
+    "test:bundler": "node scripts/verify-bundler.cjs",
+    "prepublishOnly": "npm run test:types && npm run test:bundler && npm audit --audit-level=high"
   },
   "keywords": [
     "roll",
@@ -24,18 +31,49 @@
   "author": "a-hakim",
   "license": "MIT",
   "devDependencies": {
-    "@babel/core": "^7.22.0",
-    "@babel/preset-env": "^7.22.0",
-    "babel-loader": "^9.1.2",
-    "css-loader": "^6.8.1",
-    "mini-css-extract-plugin": "^2.7.6",
-    "terser-webpack-plugin": "^5.3.9",
-    "webpack": "^5.88.0",
-    "webpack-cli": "^5.1.4",
-    "webpack-dev-server": "^4.15.1"
+    "@babel/core": "^7.29.7",
+    "@babel/preset-env": "^7.29.7",
+    "@playwright/test": "^1.63.0",
+    "babel-loader": "^9.2.1",
+    "css-loader": "^7.1.5",
+    "css-minimizer-webpack-plugin": "^8.0.0",
+    "jsdom": "^27.4.0",
+    "mini-css-extract-plugin": "^2.10.2",
+    "terser-webpack-plugin": "^5.6.1",
+    "typescript": "^7.0.2",
+    "webpack": "^5.111.1",
+    "webpack-cli": "^6.0.1"
   },
   "engines": {
-    "node": ">=14.0.0",
-    "npm": ">=6.0.0"
-  }
+    "node": ">=22.15.0",
+    "npm": ">=10.0.0"
+  },
+  "module": "dist/swr.mjs",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/swr.d.mts",
+        "default": "./dist/swr.mjs"
+      },
+      "require": {
+        "types": "./dist/swr.d.ts",
+        "default": "./dist/swr.js"
+      },
+      "default": "./dist/swr.js"
+    },
+    "./dist/*": "./dist/*",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE.md"
+  ],
+  "sideEffects": [
+    "./dist/swr.js",
+    "./dist/swr.min.js",
+    "./dist/*.css",
+    "./src/swr.js",
+    "./src/css/*.css"
+  ]
 }

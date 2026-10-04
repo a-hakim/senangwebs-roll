@@ -3,7 +3,7 @@
  */
 class EventManager {
   constructor() {
-    this.listeners = {};
+    this.listeners = Object.create(null);
   }
 
   /**
@@ -13,6 +13,7 @@ class EventManager {
    * @returns {Function} Unsubscribe function
    */
   on(event, callback) {
+    if (typeof callback !== 'function') throw new TypeError('Event callback must be a function');
     if (!this.listeners[event]) {
       this.listeners[event] = [];
     }
@@ -46,7 +47,7 @@ class EventManager {
   emit(event, data) {
     if (!this.listeners[event]) return;
 
-    this.listeners[event].forEach((callback) => {
+    [...this.listeners[event]].forEach((callback) => {
       try {
         callback(data);
       } catch (error) {
@@ -69,7 +70,7 @@ class EventManager {
    * Remove all listeners
    */
   clear() {
-    this.listeners = {};
+    this.listeners = Object.create(null);
   }
 
   /**

@@ -13,9 +13,9 @@ class Navigation {
    * Initialize navigation with total items count
    * @param {number} totalItems - Total number of items
    */
-  initialize(totalItems) {
+  initialize(totalItems, index = 0) {
     this.totalItems = totalItems;
-    this.currentIndex = 0;
+    this.currentIndex = Math.max(0, Math.min(index, totalItems - 1));
   }
 
   /**
@@ -78,7 +78,7 @@ class Navigation {
    * @returns {number} New index (clamped to valid range)
    */
   goTo(index) {
-    if (this.totalItems === 0) {
+    if (!Number.isInteger(index) || this.totalItems === 0) {
       console.warn('No items available for navigation');
       return this.currentIndex;
     }
@@ -131,7 +131,7 @@ class Navigation {
    * @returns {boolean}
    */
   canGoNext() {
-    return this.config.loop || !this.isAtEnd();
+    return this.totalItems > 1 && (this.config.loop || !this.isAtEnd());
   }
 
   /**
@@ -139,7 +139,7 @@ class Navigation {
    * @returns {boolean}
    */
   canGoPrev() {
-    return this.config.loop || !this.isAtStart();
+    return this.totalItems > 1 && (this.config.loop || !this.isAtStart());
   }
 }
 
